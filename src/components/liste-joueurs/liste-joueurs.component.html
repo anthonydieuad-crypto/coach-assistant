@@ -1,0 +1,56 @@
+
+<div class="p-4 sm:p-6">
+  <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
+    <h2 class="text-2xl font-bold text-white">Liste des Joueurs</h2>
+    <button (click)="ajouterJoueur.emit()" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-300">
+        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+        Ajouter un joueur
+    </button>
+  </div>
+
+  <div class="mb-6 flex flex-wrap items-center gap-2">
+    <span class="text-sm font-semibold text-gray-300 mr-2">Filtrer par groupe:</span>
+    <button (click)="definirFiltre('all')" [class.bg-amber-500]="filtreActif() === 'all'" [class.text-slate-900]="filtreActif() === 'all'" [class.font-bold]="filtreActif() === 'all'" [class.bg-white/10]="filtreActif() !== 'all'" class="px-3 py-1 text-sm font-medium rounded-full transition-colors">Tous</button>
+    <button (click)="definirFiltre('Equipe 1')" [class.bg-amber-500]="filtreActif() === 'Equipe 1'" [class.text-slate-900]="filtreActif() === 'Equipe 1'" [class.font-bold]="filtreActif() === 'Equipe 1'" [class.bg-white/10]="filtreActif() !== 'Equipe 1'" class="px-3 py-1 text-sm font-medium rounded-full transition-colors">Equipe 1</button>
+    <button (click)="definirFiltre('Equipe 2')" [class.bg-amber-500]="filtreActif() === 'Equipe 2'" [class.text-slate-900]="filtreActif() === 'Equipe 2'" [class.font-bold]="filtreActif() === 'Equipe 2'" [class.bg-white/10]="filtreActif() !== 'Equipe 2'" class="px-3 py-1 text-sm font-medium rounded-full transition-colors">Equipe 2</button>
+    <button (click)="definirFiltre('Equipe 3')" [class.bg-amber-500]="filtreActif() === 'Equipe 3'" [class.text-slate-900]="filtreActif() === 'Equipe 3'" [class.font-bold]="filtreActif() === 'Equipe 3'" [class.bg-white/10]="filtreActif() !== 'Equipe 3'" class="px-3 py-1 text-sm font-medium rounded-full transition-colors">Equipe 3</button>
+    <button (click)="definirFiltre('none')" [class.bg-amber-500]="filtreActif() === 'none'" [class.text-slate-900]="filtreActif() === 'none'" [class.font-bold]="filtreActif() === 'none'" [class.bg-white/10]="filtreActif() !== 'none'" class="px-3 py-1 text-sm font-medium rounded-full transition-colors">Sans groupe</button>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    @for (joueur of joueursFiltres(); track joueur.id) {
+      <div class="relative bg-slate-800/50 backdrop-blur-md rounded-lg shadow-lg border border-white/10 overflow-hidden group">
+        <button (click)="supprimerJoueur.emit(joueur); $event.stopPropagation()" class="absolute top-2 right-2 z-10 p-1.5 bg-rose-600/80 hover:bg-rose-700 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100">
+          <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+        <div (click)="voirJoueur.emit(joueur)" class="cursor-pointer transform transition-transform duration-300 hover:scale-105">
+          <img [ngSrc]="joueur.photoUrl" [alt]="'Photo de ' + joueur.prenom" width="200" height="200" class="w-full h-48 object-cover" priority>
+          <div class="p-4">
+            <h3 class="text-xl font-semibold text-white">{{ joueur.prenom }} {{ joueur.nom }}</h3>
+            @if (joueur.groupe) {
+              <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full bg-amber-400/20 text-amber-300 last:mr-0 mr-1 mt-2">
+                {{ joueur.groupe }}
+              </span>
+            } @else {
+               <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full bg-slate-400/20 text-slate-300 last:mr-0 mr-1 mt-2">
+                Sans groupe
+              </span>
+            }
+            <div class="flex items-center mt-2 text-gray-300">
+              <svg class="w-5 h-5 mr-2 text-sky-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12.75 19.5v-5.25m0 5.25H15M12.75 19.5H10.5m4.5-12.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6 21a2.25 2.25 0 0 1-2.25-2.25V15.75a2.25 2.25 0 0 1 2.25-2.25h12A2.25 2.25 0 0 1 20.25 15.75v3A2.25 2.25 0 0 1 18 21H6Z" />
+              </svg>
+              <span>Record jongles: <span class="font-bold text-sky-400">{{ getMaxJongles(joueur) }}</span></span>
+            </div>
+            <div class="flex items-center mt-1 text-gray-300">
+              <svg class="w-5 h-5 mr-2 text-lime-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <span>Présence: <span class="font-bold text-lime-400">{{ getPourcentagePresence(joueur) }}%</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    } @empty {
+      <p class="col-span-full text-center text-gray-400 py-8">Aucun joueur ne correspond à ce filtre.</p>
+    }
+  </div>
+</div>

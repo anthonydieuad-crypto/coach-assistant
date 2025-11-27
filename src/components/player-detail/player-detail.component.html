@@ -1,0 +1,166 @@
+<div class="p-4 sm:p-6">
+  <div class="flex justify-between items-center mb-6">
+    <button (click)="backToList.emit()" class="inline-flex items-center px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white font-semibold rounded-lg shadow-md transition-colors duration-300">
+      <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+      </svg>
+      Retour à la liste
+    </button>
+    <div>
+      @if (!isEditMode()) {
+        <button (click)="startEdit()" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-300">
+          <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg>
+          Modifier
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="bg-slate-800/50 backdrop-blur-lg border border-white/20 rounded-lg shadow-xl overflow-hidden max-w-4xl mx-auto">
+    <div class="md:flex">
+      <div class="md:flex-shrink-0">
+        <img class="h-48 w-full object-cover md:h-full md:w-48" [src]="player.photoUrl" [alt]="'Photo de ' + player.firstName">
+      </div>
+      <div class="p-8 flex-grow">
+        @if (!isEditMode()) {
+          <div class="uppercase tracking-wide text-sm text-cyan-400 font-semibold">{{ player.firstName }} {{ player.lastName }}</div>
+          @if (player.group) {
+              <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full bg-cyan-400/20 text-cyan-300 last:mr-0 mr-1 mt-2">
+                {{ player.group }}
+              </span>
+            }
+        } @else {
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-300">Prénom</label>
+              <input type="text" [value]="editablePlayer()?.firstName ?? ''" (input)="handlePlayerInput('firstName', $event)" class="mt-1 w-full text-white bg-slate-900/50 border border-slate-500 rounded-md shadow-sm">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-300">Nom</label>
+              <input type="text" [value]="editablePlayer()?.lastName ?? ''" (input)="handlePlayerInput('lastName', $event)" class="mt-1 w-full text-white bg-slate-900/50 border border-slate-500 rounded-md shadow-sm">
+            </div>
+             <div>
+              <label class="block text-sm font-medium text-gray-300">Groupe</label>
+              <select [value]="editablePlayer()?.group ?? 'null'" (change)="handlePlayerInput('group', $event)" class="mt-1 w-full text-white bg-slate-900/50 border border-slate-500 rounded-md shadow-sm">
+                <option value="null">Aucun</option>
+                @for(group of playerGroups; track group) {
+                  <option [value]="group">{{ group }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        }
+        
+        <div class="mt-4">
+          <h3 class="text-lg font-bold text-white mb-2">Coordonnées Parent</h3>
+          @if (!isEditMode()) {
+            <div class="space-y-2 text-gray-300">
+              <p class="flex items-center"><svg class="w-5 h-5 mr-3 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg> {{ player.parentName }}</p>
+              <p class="flex items-center"><svg class="w-5 h-5 mr-3 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" /></svg> {{ player.parentPhone }}</p>
+              <p class="flex items-center"><svg class="w-5 h-5 mr-3 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25-2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg> {{ player.parentEmail }}</p>
+            </div>
+          } @else {
+            <div class="grid grid-cols-1 gap-4">
+               <div>
+                <label class="block text-sm font-medium text-gray-300">Nom Parent</label>
+                <input type="text" [value]="editablePlayer()?.parentName ?? ''" (input)="handlePlayerInput('parentName', $event)" class="mt-1 w-full text-white bg-slate-900/50 border border-slate-500 rounded-md shadow-sm">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-300">Téléphone Parent</label>
+                <input type="tel" [value]="editablePlayer()?.parentPhone ?? ''" (input)="handlePlayerInput('parentPhone', $event)" class="mt-1 w-full text-white bg-slate-900/50 border border-slate-500 rounded-md shadow-sm">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-300">Email Parent</label>
+                <input type="email" [value]="editablePlayer()?.parentEmail ?? ''" (input)="handlePlayerInput('parentEmail', $event)" class="mt-1 w-full text-white bg-slate-900/50 border border-slate-500 rounded-md shadow-sm">
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (isEditMode()) {
+          <div class="mt-6 flex justify-end space-x-3">
+            <button type="button" (click)="cancelEdit()" class="px-4 py-2 bg-slate-600 text-gray-200 font-semibold rounded-lg hover:bg-slate-500">
+              Annuler
+            </button>
+            <button type="button" (click)="saveChanges()" class="px-4 py-2 bg-cyan-600 text-white font-semibold rounded-lg shadow-md hover:bg-cyan-700">
+              Enregistrer
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="p-8 border-t border-white/10">
+      <h3 class="text-lg font-bold text-white mb-4">Progression Jongles (Record: {{ maxJuggles() }})</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="font-semibold mb-2 text-gray-200">Ajouter un score</h4>
+          <div class="flex items-center space-x-2">
+            <input type="number" [value]="newScore() ?? ''" (input)="handleJuggleInput($event)" placeholder="Nouveau score..." class="flex-grow px-3 py-2 bg-slate-900/50 border border-slate-500 rounded-md shadow-sm">
+            <button (click)="addJugglesRecord()" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700">Ajouter</button>
+          </div>
+          <h4 class="font-semibold mt-6 mb-2 text-gray-200">Historique</h4>
+          <div class="max-h-48 overflow-y-auto border border-white/10 rounded-lg">
+            <table class="min-w-full divide-y divide-white/10">
+              <tbody class="divide-y divide-white/10">
+                @for (record of player.juggleHistory; track record.date) {
+                  <tr>
+                    <td class="px-4 py-2 text-sm">{{ formatDate(record.date) }}</td>
+                    <td class="px-4 py-2 text-sm font-bold">{{ record.score }}</td>
+                  </tr>
+                } @empty {
+                   <tr><td class="p-4 text-sm text-center text-gray-400" colspan="2">Aucun score enregistré.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="cursor-pointer" (click)="toggleChartSize()">
+          <app-juggling-chart [history]="player.juggleHistory"></app-juggling-chart>
+        </div>
+      </div>
+    </div>
+    
+     <div class="p-8 border-t border-white/10">
+      <h3 class="text-lg font-bold text-white mb-4">Historique des Convocations</h3>
+      <div class="max-h-60 overflow-y-auto">
+        <ul class="space-y-3">
+           @for(event of convocationEvents(); track event.id) {
+            <li class="p-3 bg-slate-900/40 rounded-lg flex items-center space-x-4">
+              <div class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-white" 
+                [class.bg-green-500]="event.type === 'plateau'" 
+                [class.bg-red-500]="event.type === 'match'">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+              </div>
+              <div>
+                <p class="font-semibold text-white">{{ event.title }}</p>
+                <p class="text-sm text-gray-400">{{ formatDate(event.date) }} @ {{ event.location }}</p>
+              </div>
+            </li>
+          } @empty {
+            <p class="text-gray-400 italic">Aucune convocation enregistrée.</p>
+          }
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+@if (isChartExpanded()) {
+  <div class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" (click)="toggleChartSize()">
+    <div class="bg-slate-800/80 backdrop-blur-lg border border-white/20 rounded-lg shadow-2xl p-6 w-full max-w-3xl animate-fade-in" (click)="$event.stopPropagation()">
+       <h3 class="text-xl font-bold text-white mb-4">Progression Jongles de {{ player.firstName }}</h3>
+       <app-juggling-chart [history]="player.juggleHistory"></app-juggling-chart>
+    </div>
+  </div>
+}
+<style>
+  @keyframes fade-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .animate-fade-in {
+    animation: fade-in 0.2s ease-out forwards;
+  }
+</style>
