@@ -1,14 +1,14 @@
 import {inject, Injectable, signal} from '@angular/core';
 import {Joueur} from '../models/joueur.model';
-import {HttpClient} from '@angular/common/http';
-import {environnement} from "@/src/environnements/environnement";
+import {environment} from "./../environments/environment";
+import {HttpClient} from "@angular/common/http";
 
 @Injectable({
     providedIn: 'root',
 })
 export class JoueurService {
     private http = inject(HttpClient)
-    private apiUrl = `${environnement.apiUrl}/joueurs`;
+    private apiUrl = `${environment.apiUrl}/joueurs`;
 
     private etatJoueurs = signal<Joueur[]>([]);
 

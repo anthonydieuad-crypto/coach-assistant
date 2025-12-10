@@ -1,14 +1,14 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { EvenementCalendrier } from '../models/evenement.model';
-import {environnement} from "@/src/environnements/environnement";
+import {environment} from "@/src/environments/environment";
 
 @Injectable({
   providedIn: 'root',
 })
 export class EvenementService {
   private http = inject(HttpClient);
-  private apiUrl = `${environnement.apiUrl}/evenements`;
+  private apiUrl = `${environment.apiUrl}/evenements`;
   private etatEvenements = signal<EvenementCalendrier[]>([]);
   evenements = this.etatEvenements.asReadonly();
 

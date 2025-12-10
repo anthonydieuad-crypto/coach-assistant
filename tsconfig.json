@@ -24,6 +24,11 @@
       ]
     }
   },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "index.tsx"
+  ],
   "files": [
     "./index.tsx"
   ],
