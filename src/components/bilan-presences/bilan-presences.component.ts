@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { NgClass, PercentPipe } from '@angular/common';
 import { JoueurService } from '../../services/joueur.service';
+import { EvenementService } from '../../services/evenement.service';
 
 @Component({
   selector: 'app-bilan-presences',
@@ -10,24 +11,28 @@ import { JoueurService } from '../../services/joueur.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BilanPresencesComponent {
-  // 👇 1. On se connecte au service
   private joueurService = inject(JoueurService);
+  private evenementService = inject(EvenementService);
 
-  // 👇 2. On récupère le signal des joueurs
   joueurs = this.joueurService.joueurs;
+  evenements = this.evenementService.evenements;
 
-  // Calcul du nombre total d'entraînements (basé sur l'ensemble des dates enregistrées)
+  // 1. Total des entraînements = Nombre d'événements de type 'training' dans le calendrier
   totalEntrainements = computed(() => {
-    const datesUniques = new Set<string>();
-    this.joueurs().forEach(j => {
-      j.presences.forEach(date => datesUniques.add(date));
-    });
-    return datesUniques.size;
+    return this.evenements().filter(e => e.type === 'training').length;
   });
 
-  getTauxPresence(joueur: any): number {
+  // 2. Nouvelle méthode : On compte les présences en regardant le Calendrier
+  getNbPresences(joueurId: number): number {
+    return this.evenements().filter(e =>
+        e.type === 'training' && e.participants.includes(joueurId)
+    ).length;
+  }
+
+  // 3. Le taux est basé sur ce nouveau calcul
+  getTauxPresence(joueurId: number): number {
     const total = this.totalEntrainements();
     if (total === 0) return 0;
-    return joueur.presences.length / total;
+    return this.getNbPresences(joueurId) / total;
   }
 }

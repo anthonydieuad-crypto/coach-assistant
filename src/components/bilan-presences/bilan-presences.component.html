@@ -1,5 +1,5 @@
 <div class="p-6 min-h-screen text-gray-100">
-    <h2 class="text-2xl font-bold mb-6">Bilan des Présences</h2>
+    <h2 class="text-2xl font-bold mb-6">Bilan des Présences à l'Entraînement</h2>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-slate-800/50 p-6 rounded-xl border border-white/10 shadow-lg">
@@ -7,8 +7,8 @@
             <p class="text-3xl font-bold text-white mt-2">{{ totalEntrainements() }}</p>
         </div>
         <div class="bg-slate-800/50 p-6 rounded-xl border border-white/10 shadow-lg">
-            <h3 class="text-gray-400 text-sm font-medium">Effectif Total</h3>
-            <p class="text-3xl font-bold text-amber-500 mt-2">{{ joueurs().length }}</p>
+            <h3 class="text-gray-400 text-sm font-medium">Effectif</h3>
+            <p class="text-3xl font-bold text-amber-500 mt-2">{{ joueurs().length }} joueurs</p>
         </div>
     </div>
 
@@ -30,22 +30,25 @@
                                 {{ joueur.prenom }} {{ joueur.nom }}
                                 <div class="text-xs text-gray-500 font-normal">{{ joueur.groupe || 'Sans groupe' }}</div>
                             </td>
-                            <td class="p-4 text-center text-emerald-400 font-bold">
-                                {{ joueur.presences.length }}
+
+                            <td class="p-4 text-center text-emerald-400 font-bold text-lg">
+                                {{ getNbPresences(joueur.id) }}
                             </td>
+
                             <td class="p-4 text-center text-rose-400 font-bold">
-                                {{ totalEntrainements() - joueur.presences.length }}
+                                {{ totalEntrainements() - getNbPresences(joueur.id) }}
                             </td>
+
                             <td class="p-4 text-right">
                                 <div class="flex items-center justify-end gap-3">
-                  <span class="font-bold"
-                        [ngClass]="getTauxPresence(joueur) >= 0.75 ? 'text-emerald-400' : (getTauxPresence(joueur) >= 0.5 ? 'text-amber-400' : 'text-rose-400')">
-                    {{ getTauxPresence(joueur) | percent:'1.0-0' }}
+                  <span class="font-bold w-12 text-right"
+                        [ngClass]="getTauxPresence(joueur.id) >= 0.75 ? 'text-emerald-400' : (getTauxPresence(joueur.id) >= 0.5 ? 'text-amber-400' : 'text-rose-400')">
+                    {{ getTauxPresence(joueur.id) | percent:'1.0-0' }}
                   </span>
-                                    <div class="w-16 h-2 bg-slate-700 rounded-full overflow-hidden">
+                                    <div class="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
                                         <div class="h-full rounded-full transition-all"
-                                             [style.width.%]="getTauxPresence(joueur) * 100"
-                                             [ngClass]="getTauxPresence(joueur) >= 0.75 ? 'bg-emerald-500' : (getTauxPresence(joueur) >= 0.5 ? 'bg-amber-500' : 'bg-rose-500')">
+                                             [style.width.%]="getTauxPresence(joueur.id) * 100"
+                                             [ngClass]="getTauxPresence(joueur.id) >= 0.75 ? 'bg-emerald-500' : (getTauxPresence(joueur.id) >= 0.5 ? 'bg-amber-500' : 'bg-rose-500')">
                                         </div>
                                     </div>
                                 </div>
