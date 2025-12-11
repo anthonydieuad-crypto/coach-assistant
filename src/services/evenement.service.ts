@@ -42,6 +42,12 @@ export class EvenementService {
       error: (err) => console.error('Erreur maj événement:', err)
     });
   }
-
-  // Tu peux ajouter supprimerEvenement si tu veux, ton back le supporte.
+  supprimerEvenement(id: number) {
+    this.http.delete(`${this.apiUrl}/${id}`).subscribe({
+      next: () => {
+        this.etatEvenements.update(liste => liste.filter(e => e.id !== id));
+      },
+      error: (err) => console.error('Erreur suppression événement:', err)
+    });
+  }
 }

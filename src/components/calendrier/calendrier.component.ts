@@ -203,4 +203,11 @@ export class CalendrierComponent {
       groupe: undefined
     };
   }
+    supprimerEvenement() {
+        const id = this.idEvenementEnEdition();
+        if (id && confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) {
+            this.evenementService.supprimerEvenement(id);
+            this.fermerModale();
+        }
+    }
 }
