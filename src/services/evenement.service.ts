@@ -11,6 +11,7 @@ export class EvenementService {
   private apiUrl = `${environment.apiUrl}/evenements`;
   private etatEvenements = signal<EvenementCalendrier[]>([]);
   evenements = this.etatEvenements.asReadonly();
+  brouillonEvenement = signal<Partial<EvenementCalendrier> | null>(null);
 
   constructor() {
     this.chargerEvenements();

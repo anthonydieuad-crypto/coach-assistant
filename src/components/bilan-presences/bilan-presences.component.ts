@@ -1,48 +1,33 @@
-
-import { ChangeDetectionStrategy, Component, computed, Input } from '@angular/core';
-import { Joueur } from '../../models/joueur.model';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { NgClass, PercentPipe } from '@angular/common';
+import { JoueurService } from '../../services/joueur.service';
 
 @Component({
   selector: 'app-bilan-presences',
   standalone: true,
+  imports: [NgClass, PercentPipe],
   templateUrl: './bilan-presences.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BilanPresencesComponent {
-  @Input({ required: true }) joueurs: Joueur[] = [];
-  
-  datesEntrainement = computed(() => {
-    const toutesLesDates = new Set<string>();
-    this.joueurs.forEach(joueur => {
-        joueur.presences.forEach(date => toutesLesDates.add(date));
+  // 👇 1. On se connecte au service
+  private joueurService = inject(JoueurService);
+
+  // 👇 2. On récupère le signal des joueurs
+  joueurs = this.joueurService.joueurs;
+
+  // Calcul du nombre total d'entraînements (basé sur l'ensemble des dates enregistrées)
+  totalEntrainements = computed(() => {
+    const datesUniques = new Set<string>();
+    this.joueurs().forEach(j => {
+      j.presences.forEach(date => datesUniques.add(date));
     });
-    return Array.from(toutesLesDates).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+    return datesUniques.size;
   });
 
-  statsJoueur = computed(() => {
-    const dates = this.datesEntrainement();
-    return this.joueurs.map(joueur => {
-      const presences = joueur.presences.length;
-      const absences = dates.length - presences;
-      return { ...joueur, presences, absences };
-    });
-  });
-
-  statsDate = computed(() => {
-    const dates = this.datesEntrainement();
-    return dates.map(date => {
-        const presents = this.joueurs.filter(p => p.presences.includes(date)).length;
-        return { date, presents };
-    });
-  });
-
-  estJoueurPresent(joueur: Joueur, date: string): boolean {
-    return joueur.presences.includes(date);
-  }
-
-  formaterDate(dateString: string): string {
-    const date = new Date(dateString);
-    // Retourne le format JJ/MM
-    return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+  getTauxPresence(joueur: any): number {
+    const total = this.totalEntrainements();
+    if (total === 0) return 0;
+    return joueur.presences.length / total;
   }
 }

@@ -1,141 +1,189 @@
-
 <div class="p-4 sm:p-6">
-  <div class="flex items-center justify-between mb-6">
-    <h2 class="text-2xl font-bold text-white capitalize">{{ libelleMoisCourant() }}</h2>
-    <div class="flex items-center space-x-2">
-      <button (click)="changerMois(-1)" class="p-2 rounded-full text-gray-300 hover:bg-white/10">
-        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
-      </button>
-      <button (click)="changerMois(1)" class="p-2 rounded-full text-gray-300 hover:bg-white/10">
-        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
-      </button>
-      <button (click)="ouvrirModaleNouveau()" class="ml-4 inline-flex items-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-300">
-        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-        Ajouter un événement
-      </button>
-    </div>
-  </div>
-
-  <div class="bg-slate-800/50 backdrop-blur-lg border border-white/10 rounded-lg shadow-lg overflow-hidden">
-    <div class="grid grid-cols-7 gap-px border-b border-white/10">
-      @for (jour of joursSemaine; track jour) {
-        <div class="text-center py-3 text-sm font-semibold text-gray-300">{{ jour }}</div>
-      }
-    </div>
-    <div class="grid grid-cols-7 gap-px bg-black/20">
-      @for (jour of grilleCalendrier(); track jour.date.toISOString()) {
-        <div (click)="ouvrirModaleNouveau(jour.date)" class="relative min-h-28 p-2 cursor-pointer hover:bg-white/10 transition-colors bg-slate-800/30" [class.opacity-50]="!jour.estMoisCourant">
-          <time [dateTime]="jour.date.toISOString().split('T')[0]" 
-                class="font-semibold"
-                [class.text-slate-900]="estAujourdhui(jour.date)"
-                [class.bg-amber-400]="estAujourdhui(jour.date)"
-                [class.text-white]="!estAujourdhui(jour.date)"
-                [class.w-7]="estAujourdhui(jour.date)"
-                [class.h-7]="estAujourdhui(jour.date)"
-                [class.rounded-full]="estAujourdhui(jour.date)"
-                [class.flex]="estAujourdhui(jour.date)"
-                [class.items-center]="estAujourdhui(jour.date)"
-                [class.justify-center]="estAujourdhui(jour.date)">
-            {{ jour.date.getDate() }}
-          </time>
-          <div class="mt-1 space-y-1">
-            @for (evenement of jour.evenements; track evenement.id) {
-              <div (click)="ouvrirModaleEdition(evenement); $event.stopPropagation()" class="text-xs p-1 rounded-md text-white hover:ring-2 hover:ring-offset-2 ring-offset-slate-800"
-                  [class.bg-sky-500]="evenement.type === 'training'" [class.hover:ring-sky-400]="evenement.type === 'training'"
-                  [class.bg-emerald-500]="evenement.type === 'plateau'" [class.hover:ring-emerald-400]="evenement.type === 'plateau'"
-                  [class.bg-rose-500]="evenement.type === 'match'" [class.hover:ring-rose-400]="evenement.type === 'match'"
-                  [class.bg-orange-500]="evenement.type === 'cohesion'" [class.hover:ring-orange-400]="evenement.type === 'cohesion'"
-                  [class.bg-purple-500]="evenement.type === 'tournoi'" [class.hover:ring-purple-400]="evenement.type === 'tournoi'">
-                <div class="font-semibold truncate">{{ evenement.titre }}</div>
-                <div class="text-white/90 truncate"><span class="font-medium">@</span> {{ evenement.lieu }}</div>
-                @if (evenement.equipesAdverses) {
-                  <div class="text-white/90 truncate"><span class="font-medium">vs</span> {{ evenement.equipesAdverses }}</div>
-                }
-              </div>
-            }
-          </div>
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-white capitalize">{{ libelleMoisCourant() }}</h2>
+        <div class="flex items-center space-x-2">
+            <button (click)="changerMois(-1)" class="p-2 rounded-full text-gray-300 hover:bg-white/10">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/>
+                </svg>
+            </button>
+            <button (click)="changerMois(1)" class="p-2 rounded-full text-gray-300 hover:bg-white/10">
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+                </svg>
+            </button>
+            <button (click)="ouvrirModaleNouveau()"
+                    class="ml-4 inline-flex items-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-300">
+                <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                </svg>
+                Ajouter un événement
+            </button>
         </div>
-      }
     </div>
-  </div>
+
+    <div class="bg-slate-800/50 backdrop-blur-lg border border-white/10 rounded-lg shadow-lg overflow-hidden">
+        <div class="grid grid-cols-7 gap-px border-b border-white/10">
+            @for (jour of joursSemaine; track jour) {
+                <div class="text-center py-3 text-sm font-semibold text-gray-300">{{ jour }}</div>
+            }
+        </div>
+        <div class="grid grid-cols-7 gap-px bg-black/20">
+            @for (jour of grilleCalendrier(); track jour.date.toISOString()) {
+                <div (click)="ouvrirModaleNouveau(jour.date)"
+                     class="relative min-h-28 p-2 cursor-pointer hover:bg-white/10 transition-colors bg-slate-800/30"
+                     [class.opacity-50]="!jour.estMoisCourant">
+                    <time [dateTime]="jour.date.toISOString().split('T')[0]"
+                          class="font-semibold"
+                          [class.text-slate-900]="estAujourdhui(jour.date)"
+                          [class.bg-amber-400]="estAujourdhui(jour.date)"
+                          [class.text-white]="!estAujourdhui(jour.date)"
+                          [class.w-7]="estAujourdhui(jour.date)"
+                          [class.h-7]="estAujourdhui(jour.date)"
+                          [class.rounded-full]="estAujourdhui(jour.date)"
+                          [class.flex]="estAujourdhui(jour.date)"
+                          [class.items-center]="estAujourdhui(jour.date)"
+                          [class.justify-center]="estAujourdhui(jour.date)">
+                        {{ jour.date.getDate() }}
+                    </time>
+                    <div class="mt-1 space-y-1">
+                        @for (evenement of jour.evenements; track evenement.id) {
+                            <div (click)="ouvrirModaleEdition(evenement); $event.stopPropagation()"
+                                 class="text-xs p-1 rounded-md text-white hover:ring-2 hover:ring-offset-2 ring-offset-slate-800"
+                                 [class.bg-sky-500]="evenement.type === 'training'"
+                                 [class.hover:ring-sky-400]="evenement.type === 'training'"
+                                 [class.bg-emerald-500]="evenement.type === 'plateau'"
+                                 [class.hover:ring-emerald-400]="evenement.type === 'plateau'"
+                                 [class.bg-rose-500]="evenement.type === 'match'"
+                                 [class.hover:ring-rose-400]="evenement.type === 'match'"
+                                 [class.bg-orange-500]="evenement.type === 'cohesion'"
+                                 [class.hover:ring-orange-400]="evenement.type === 'cohesion'"
+                                 [class.bg-purple-500]="evenement.type === 'tournoi'"
+                                 [class.hover:ring-purple-400]="evenement.type === 'tournoi'">
+                                <div class="font-semibold truncate">{{ evenement.titre }}</div>
+                                <div class="text-white/90 truncate"><span
+                                        class="font-medium">@</span> {{ evenement.lieu }}
+                                </div>
+                                @if (evenement.equipesAdverses) {
+                                    <div class="text-white/90 truncate"><span
+                                            class="font-medium">vs</span> {{ evenement.equipesAdverses }}
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
 </div>
 
 <!-- Modal for adding/editing event -->
 @if (estModaleOuverte()) {
-  <div class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" (click)="fermerModale()">
-    <div class="bg-slate-800/80 backdrop-blur-lg border border-white/20 rounded-lg shadow-2xl p-6 w-full max-w-lg animate-fade-in" (click)="$event.stopPropagation()">
-      <h3 class="text-xl font-bold text-white mb-4">
-        {{ idEvenementEnEdition() ? 'Modifier' : 'Ajouter' }} un événement
-      </h3>
-      <form (submit)="$event.preventDefault(); enregistrerEvenement()">
-        <div class="space-y-4">
-          <div>
-            <label for="event-type" class="block text-sm font-medium text-gray-300">Type</label>
-            <select id="event-type" [value]="nouvelEvenement().type" (change)="gererSaisieEvenement('type', $event)" class="mt-1 block w-full px-3 py-2 bg-slate-900/50 border border-slate-500 rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500">
-              <option value="training">Entraînement</option>
-              <option value="plateau">Plateau</option>
-              <option value="match">Match amical</option>
-                <option value="tournoi">Tournoi</option>
-              <option value="cohesion">Sortie cohésion d'équipe</option>
-            </select>
-          </div>
-          <div>
-            <label for="event-date" class="block text-sm font-medium text-gray-300">Date</label>
-            <input type="date" id="event-date" [value]="nouvelEvenement().date" (input)="gererSaisieEvenement('date', $event)" class="mt-1 block w-full px-3 py-2 bg-slate-900/50 border border-slate-500 rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500" required>
-          </div>
-          <div>
-            <label for="event-title" class="block text-sm font-medium text-gray-300">Titre</label>
-            <input type="text" id="event-title" [value]="nouvelEvenement().titre" (input)="gererSaisieEvenement('titre', $event)" class="mt-1 block w-full px-3 py-2 bg-slate-900/50 border border-slate-500 rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500" required>
-          </div>
-          <div>
-            <label for="event-location" class="block text-sm font-medium text-gray-300">Lieu</label>
-            <input type="text" id="event-location" [value]="nouvelEvenement().lieu" (input)="gererSaisieEvenement('lieu', $event)" placeholder="ex: Stade Municipal" class="mt-1 block w-full px-3 py-2 bg-slate-900/50 border border-slate-500 rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500" required>
-          </div>
+    <div class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" (click)="fermerModale()">
+        <div class="bg-slate-800/80 backdrop-blur-lg border border-white/20 rounded-lg shadow-2xl p-6 w-full max-w-lg animate-fade-in"
+             (click)="$event.stopPropagation()">
+            <h3 class="text-xl font-bold text-white mb-4">
+                {{ idEvenementEnEdition() ? 'Modifier' : 'Ajouter' }} un événement
+            </h3>
+            <form (submit)="$event.preventDefault(); enregistrerEvenement()">
+                <div class="space-y-4">
+                    <div>
+                        <label for="event-type" class="block text-sm font-medium text-gray-300">Type</label>
+                        <select id="event-type" [value]="nouvelEvenement().type"
+                                (change)="gererSaisieEvenement('type', $event)"
+                                class="mt-1 block w-full px-3 py-2 bg-slate-900/50 border border-slate-500 rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+                            <option value="training">Entraînement</option>
+                            <option value="plateau">Plateau</option>
+                            <option value="match">Match amical</option>
+                            <option value="tournoi">Tournoi</option>
+                            <option value="cohesion">Sortie cohésion d'équipe</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="event-date" class="block text-sm font-medium text-gray-300">Date</label>
+                        <input type="date" id="event-date" [value]="nouvelEvenement().date"
+                               (input)="gererSaisieEvenement('date', $event)"
+                               class="mt-1 block w-full px-3 py-2 bg-slate-900/50 border border-slate-500 rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"
+                               required>
+                    </div>
+                    <div>
+                        <label for="event-title" class="block text-sm font-medium text-gray-300">Titre</label>
+                        <input type="text" id="event-title" [value]="nouvelEvenement().titre"
+                               (input)="gererSaisieEvenement('titre', $event)"
+                               class="mt-1 block w-full px-3 py-2 bg-slate-900/50 border border-slate-500 rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"
+                               required>
+                    </div>
+                    <div>
+                        <label for="event-location" class="block text-sm font-medium text-gray-300">Lieu</label>
+                        <input type="text" id="event-location" [value]="nouvelEvenement().lieu"
+                               (input)="gererSaisieEvenement('lieu', $event)" placeholder="ex: Stade Municipal"
+                               class="mt-1 block w-full px-3 py-2 bg-slate-900/50 border border-slate-500 rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"
+                               required>
+                    </div>
 
-            @if (nouvelEvenement().type === 'plateau' || nouvelEvenement().type === 'match' || nouvelEvenement().type === 'tournoi') {            <div>
-              <label for="event-group" class="block text-sm font-medium text-gray-300">Groupe</label>
-              <select id="event-group" [value]="nouvelEvenement().groupe ?? 'null'" (change)="gererSaisieEvenement('groupe', $event)" class="mt-1 block w-full px-3 py-2 bg-slate-900/50 border border-slate-500 rounded-md shadow-sm">
-                <option value="null">Aucun</option>
-                @for(groupe of groupesJoueur; track groupe) {
-                  <option [value]="groupe">{{ groupe }}</option>
-                }
-              </select>
-            </div>
-            <div>
-              <label for="event-opponents" class="block text-sm font-medium text-gray-300">Équipes adverses</label>
-              <textarea id="event-opponents" rows="2" [value]="nouvelEvenement().equipesAdverses" (input)="gererSaisieEvenement('equipesAdverses', $event)" placeholder="ex: FC Voisins, US Amis" class="mt-1 block w-full px-3 py-2 bg-slate-900/50 border border-slate-500 rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"></textarea>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-300">Participants</label>
-              <div class="mt-2 max-h-40 overflow-y-auto border border-slate-500 rounded-md p-2 space-y-2">
-                @for (joueur of tousLesJoueurs(); track joueur.id) {
-                  <label class="flex items-center">
-                    <input type="checkbox" [checked]="nouvelEvenement().participants.includes(joueur.id)" (change)="basculerParticipant(joueur.id)" class="h-4 w-4 rounded border-gray-400 text-amber-500 focus:ring-amber-500 bg-transparent">
-                    <span class="ml-2 text-sm text-gray-200">{{ joueur.prenom }} {{ joueur.nom }}</span>
-                  </label>
-                }
-              </div>
-            </div>
-          }
+                    @if (nouvelEvenement().type === 'plateau' || nouvelEvenement().type === 'match' || nouvelEvenement().type === 'tournoi' || nouvelEvenement().type === 'training') {
+                        <div>
+                            <label for="event-group" class="block text-sm font-medium text-gray-300">Groupe</label>
+                            <select id="event-group" [value]="nouvelEvenement().groupe ?? 'null'"
+                                    (change)="gererSaisieEvenement('groupe', $event)"
+                                    class="mt-1 block w-full px-3 py-2 bg-slate-900/50 border border-slate-500 rounded-md shadow-sm">
+                                <option value="null">Aucun</option>
+                                @for (groupe of groupesJoueur; track groupe) {
+                                    <option [value]="groupe">{{ groupe }}</option>
+                                }
+                            </select>
+                        </div>
+                        <div>
+                            <label for="event-opponents" class="block text-sm font-medium text-gray-300">Équipes
+                                adverses</label>
+                            <textarea id="event-opponents" rows="2" [value]="nouvelEvenement().equipesAdverses"
+                                      (input)="gererSaisieEvenement('equipesAdverses', $event)"
+                                      placeholder="ex: FC Voisins, US Amis"
+                                      class="mt-1 block w-full px-3 py-2 bg-slate-900/50 border border-slate-500 rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300">Participants</label>
+                            <div class="mt-2 max-h-40 overflow-y-auto border border-slate-500 rounded-md p-2 space-y-2">
+                                @for (joueur of tousLesJoueurs(); track joueur.id) {
+                                    <label class="flex items-center">
+                                        <input type="checkbox"
+                                               [checked]="nouvelEvenement().participants.includes(joueur.id)"
+                                               (change)="basculerParticipant(joueur.id)"
+                                               class="h-4 w-4 rounded border-gray-400 text-amber-500 focus:ring-amber-500 bg-transparent">
+                                        <span class="ml-2 text-sm text-gray-200">{{ joueur.prenom }} {{ joueur.nom }}</span>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="mt-6 flex justify-between items-center">
+                    @if (idEvenementEnEdition()) {
+                        <button type="button" (click)="supprimerEvenement()"
+                                class="px-4 py-2 bg-rose-600/80 text-white font-semibold rounded-lg hover:bg-rose-700 transition-colors">
+                            Supprimer
+                        </button>
+                    } @else {
+                        <div></div>
+                    }
+
+                    <div class="flex space-x-3">
+                        <button type="button" (click)="fermerModale()"
+                                class="px-4 py-2 bg-slate-600 text-gray-200 font-semibold rounded-lg hover:bg-slate-500">
+                            Annuler
+                        </button>
+                        <button type="submit"
+                                [disabled]="!nouvelEvenement().titre.trim() || !nouvelEvenement().date || !nouvelEvenement().lieu.trim()"
+                                class="px-4 py-2 bg-amber-600 text-white font-semibold rounded-lg shadow-md hover:bg-amber-700 disabled:bg-gray-500 disabled:cursor-not-allowed">
+                            Enregistrer
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
-          <div class="mt-6 flex justify-between items-center">
-              @if (idEvenementEnEdition()) {
-                  <button type="button" (click)="supprimerEvenement()" class="px-4 py-2 bg-rose-600/80 text-white font-semibold rounded-lg hover:bg-rose-700 transition-colors">
-                      Supprimer
-                  </button>
-              } @else {
-                  <div></div> }
-
-              <div class="flex space-x-3">
-                  <button type="button" (click)="fermerModale()" class="px-4 py-2 bg-slate-600 text-gray-200 font-semibold rounded-lg hover:bg-slate-500">
-                      Annuler
-                  </button>
-                  <button type="submit" [disabled]="!nouvelEvenement().titre.trim() || !nouvelEvenement().date || !nouvelEvenement().lieu.trim()" class="px-4 py-2 bg-amber-600 text-white font-semibold rounded-lg shadow-md hover:bg-amber-700 disabled:bg-gray-500 disabled:cursor-not-allowed">
-                      Enregistrer
-                  </button>
-              </div>
-          </div>
-      </form>
     </div>
-  </div>
 }

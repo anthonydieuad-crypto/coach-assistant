@@ -1,5 +1,5 @@
 
-import { ChangeDetectionStrategy, Component, computed, inject, signal, WritableSignal } from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, OnInit, signal, WritableSignal} from '@angular/core';
 import { EvenementService } from '../../services/evenement.service';
 import { JoueurService } from '../../services/joueur.service';
 import { EvenementCalendrier, TypeEvenement } from '../../models/evenement.model';
@@ -21,7 +21,7 @@ type EtatNouvelEvenement = Omit<EvenementCalendrier, 'id'>;
   styleUrls: ['./calendrier.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CalendrierComponent {
+export class CalendrierComponent implements OnInit{
   private evenementService = inject(EvenementService);
   private joueurService = inject(JoueurService);
   
@@ -37,6 +37,25 @@ export class CalendrierComponent {
   nouvelEvenement: WritableSignal<EtatNouvelEvenement> = signal(this.getEtatInitialEvenement());
   
   joursSemaine = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+
+    ngOnInit() {
+        const brouillon = this.evenementService.brouillonEvenement();
+
+        if (brouillon) {
+            this.nouvelEvenement.set({
+                titre: brouillon.titre || 'Entraînement',
+                date: brouillon.date || new Date().toISOString().split('T')[0],
+                type: 'training', // On force le type entraînement
+                lieu: brouillon.lieu || '',
+                participants: brouillon.participants || [], // ✅ On récupère les joueurs
+                equipesAdverses: '',
+                groupe: undefined
+            });
+
+            this.estModaleOuverte.set(true);
+            this.evenementService.brouillonEvenement.set(null);
+        }
+    }
 
   grilleCalendrier = computed<JourCalendrier[]>(() => {
     const date = this.dateVue();

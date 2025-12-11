@@ -1,56 +1,122 @@
-
 <div class="p-4 sm:p-6">
-  <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
-    <h2 class="text-2xl font-bold text-white">Liste des Joueurs</h2>
-    <button (click)="ajouterJoueur.emit()" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-300">
-        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-        Ajouter un joueur
-    </button>
-  </div>
-
-  <div class="mb-6 flex flex-wrap items-center gap-2">
-    <span class="text-sm font-semibold text-gray-300 mr-2">Filtrer par groupe:</span>
-    <button (click)="definirFiltre('all')" [class.bg-amber-500]="filtreActif() === 'all'" [class.text-slate-900]="filtreActif() === 'all'" [class.font-bold]="filtreActif() === 'all'" [class.bg-white/10]="filtreActif() !== 'all'" class="px-3 py-1 text-sm font-medium rounded-full transition-colors">Tous</button>
-    <button (click)="definirFiltre('Equipe 1')" [class.bg-amber-500]="filtreActif() === 'Equipe 1'" [class.text-slate-900]="filtreActif() === 'Equipe 1'" [class.font-bold]="filtreActif() === 'Equipe 1'" [class.bg-white/10]="filtreActif() !== 'Equipe 1'" class="px-3 py-1 text-sm font-medium rounded-full transition-colors">Equipe 1</button>
-    <button (click)="definirFiltre('Equipe 2')" [class.bg-amber-500]="filtreActif() === 'Equipe 2'" [class.text-slate-900]="filtreActif() === 'Equipe 2'" [class.font-bold]="filtreActif() === 'Equipe 2'" [class.bg-white/10]="filtreActif() !== 'Equipe 2'" class="px-3 py-1 text-sm font-medium rounded-full transition-colors">Equipe 2</button>
-    <button (click)="definirFiltre('Equipe 3')" [class.bg-amber-500]="filtreActif() === 'Equipe 3'" [class.text-slate-900]="filtreActif() === 'Equipe 3'" [class.font-bold]="filtreActif() === 'Equipe 3'" [class.bg-white/10]="filtreActif() !== 'Equipe 3'" class="px-3 py-1 text-sm font-medium rounded-full transition-colors">Equipe 3</button>
-    <button (click)="definirFiltre('none')" [class.bg-amber-500]="filtreActif() === 'none'" [class.text-slate-900]="filtreActif() === 'none'" [class.font-bold]="filtreActif() === 'none'" [class.bg-white/10]="filtreActif() !== 'none'" class="px-3 py-1 text-sm font-medium rounded-full transition-colors">Sans groupe</button>
-  </div>
-
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    @for (joueur of joueursFiltres(); track joueur.id) {
-      <div class="relative bg-slate-800/50 backdrop-blur-md rounded-lg shadow-lg border border-white/10 overflow-hidden group">
-        <button (click)="supprimerJoueur.emit(joueur); $event.stopPropagation()" class="absolute top-2 right-2 z-10 p-1.5 bg-rose-600/80 hover:bg-rose-700 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100">
-          <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+    <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
+        <h2 class="text-2xl font-bold text-white">Liste des Joueurs</h2>
+        <button (click)="gererDemandeAjoutJoueur()" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-300">
+            <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+            Ajouter un joueur
         </button>
-        <div (click)="voirJoueur.emit(joueur)" class="cursor-pointer transform transition-transform duration-300 hover:scale-105">
-          <img [ngSrc]="joueur.photoUrl" [alt]="'Photo de ' + joueur.prenom" width="200" height="200" class="w-full h-48 object-cover" priority>
-          <div class="p-4">
-            <h3 class="text-xl font-semibold text-white">{{ joueur.prenom }} {{ joueur.nom }}</h3>
-            @if (joueur.groupe) {
-              <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full bg-amber-400/20 text-amber-300 last:mr-0 mr-1 mt-2">
+    </div>
+
+    <div class="mb-6 flex flex-wrap items-center gap-2">
+        <span class="text-sm font-semibold text-gray-300 mr-2">Filtrer par groupe:</span>
+        @for (groupe of ['all', 'Equipe 1', 'Equipe 2', 'Equipe 3', 'none']; track groupe) {
+            <button (click)="definirFiltre($any(groupe))"
+                    [ngClass]="filtreActif() === groupe ? 'bg-amber-500 text-slate-900 font-bold' : 'bg-white/10'"
+                    class="px-3 py-1 text-sm font-medium rounded-full transition-colors">
+                {{ groupe === 'all' ? 'Tous' : (groupe === 'none' ? 'Sans groupe' : groupe) }}
+            </button>
+        }
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        @for (joueur of joueursFiltres(); track joueur.id) {
+            <div class="relative bg-slate-800/50 backdrop-blur-md rounded-lg shadow-lg border border-white/10 overflow-hidden group">
+
+                <button (click)="gererSupprimerJoueur(joueur); $event.stopPropagation()" class="absolute top-2 right-2 z-10 p-1.5 bg-rose-600/80 hover:bg-rose-700 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 cursor-pointer">
+                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+
+                <div (click)="voirDetailJoueur(joueur)" class="cursor-pointer transform transition-transform duration-300 hover:scale-105">
+
+                    @if (joueur.photoUrl) {
+                        <img [ngSrc]="joueur.photoUrl" [alt]="'Photo de ' + joueur.prenom" width="200" height="200" class="w-full h-48 object-cover" priority>
+                    } @else {
+                        <div class="w-full h-48 bg-slate-700 flex items-center justify-center text-slate-500">
+                            <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 24 24"><path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                        </div>
+                    }
+
+                    <div class="p-4">
+                        <h3 class="text-xl font-semibold text-white">{{ joueur.prenom }} {{ joueur.nom }}</h3>
+                        @if (joueur.groupe) {
+                            <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full bg-amber-400/20 text-amber-300 last:mr-0 mr-1 mt-2">
                 {{ joueur.groupe }}
               </span>
-            } @else {
-               <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full bg-slate-400/20 text-slate-300 last:mr-0 mr-1 mt-2">
+                        } @else {
+                            <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full bg-slate-400/20 text-slate-300 last:mr-0 mr-1 mt-2">
                 Sans groupe
               </span>
-            }
-            <div class="flex items-center mt-2 text-gray-300">
-              <svg class="w-5 h-5 mr-2 text-sky-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12.75 19.5v-5.25m0 5.25H15M12.75 19.5H10.5m4.5-12.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6 21a2.25 2.25 0 0 1-2.25-2.25V15.75a2.25 2.25 0 0 1 2.25-2.25h12A2.25 2.25 0 0 1 20.25 15.75v3A2.25 2.25 0 0 1 18 21H6Z" />
-              </svg>
-              <span>Record jongles: <span class="font-bold text-sky-400">{{ getMaxJongles(joueur) }}</span></span>
+                        }
+                        <div class="flex items-center mt-2 text-gray-300">
+                            <svg class="w-5 h-5 mr-2 text-sky-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12.75 19.5v-5.25m0 5.25H15M12.75 19.5H10.5m4.5-12.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6 21a2.25 2.25 0 0 1-2.25-2.25V15.75a2.25 2.25 0 0 1 2.25-2.25h12A2.25 2.25 0 0 1 20.25 15.75v3A2.25 2.25 0 0 1 18 21H6Z" />
+                            </svg>
+                            <span>Record jongles: <span class="font-bold text-sky-400">{{ getMaxJongles(joueur) }}</span></span>
+                        </div>
+                        <div class="flex items-center mt-1 text-gray-300">
+                            <svg class="w-5 h-5 mr-2 text-lime-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>Présence: <span class="font-bold text-lime-400">{{ getPourcentagePresence(joueur) }}%</span></span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="flex items-center mt-1 text-gray-300">
-              <svg class="w-5 h-5 mr-2 text-lime-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              <span>Présence: <span class="font-bold text-lime-400">{{ getPourcentagePresence(joueur) }}%</span></span>
+        } @empty {
+            <p class="col-span-full text-center text-gray-400 py-8">Aucun joueur ne correspond à ce filtre.</p>
+        }
+    </div>
+
+    @if (estModaleAjoutJoueurOuverte()) {
+        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity" (click)="fermerModaleAjoutJoueur()"></div>
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                <div class="relative transform overflow-hidden rounded-lg bg-slate-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-slate-700">
+                    <div class="px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                        <h3 class="text-xl font-semibold leading-6 text-white mb-4">Nouveau Joueur</h3>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300">Prénom</label>
+                                    <input type="text" [value]="nouveauJoueur().prenom" (input)="gererSaisieNouveauJoueur('prenom', $event)" class="mt-1 block w-full rounded-md border-gray-600 bg-slate-700 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300">Nom</label>
+                                    <input type="text" [value]="nouveauJoueur().nom" (input)="gererSaisieNouveauJoueur('nom', $event)" class="mt-1 block w-full rounded-md border-gray-600 bg-slate-700 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300">Groupe</label>
+                                <select [value]="nouveauJoueur().groupe || 'null'" (change)="gererSaisieNouveauJoueur('groupe', $event)" class="mt-1 block w-full rounded-md border-gray-600 bg-slate-700 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2">
+                                    <option value="null">-- Aucun --</option>
+                                    <option value="Equipe 1">Equipe 1</option>
+                                    <option value="Equipe 2">Equipe 2</option>
+                                    <option value="Equipe 3">Equipe 3</option>
+                                </select>
+                            </div>
+                            <div class="border-t border-slate-700 pt-4 mt-2">
+                                <p class="text-xs text-gray-400 uppercase font-bold mb-3">Contact Parent</p>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300">Nom complet</label>
+                                        <input type="text" [value]="nouveauJoueur().nomParent" (input)="gererSaisieNouveauJoueur('nomParent', $event)" class="mt-1 block w-full rounded-md border-gray-600 bg-slate-700 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300">Téléphone</label>
+                                        <input type="tel" [value]="nouveauJoueur().telParent" (input)="gererSaisieNouveauJoueur('telParent', $event)" class="mt-1 block w-full rounded-md border-gray-600 bg-slate-700 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-300">Email</label>
+                                        <input type="email" [value]="nouveauJoueur().emailParent" (input)="gererSaisieNouveauJoueur('emailParent', $event)" class="mt-1 block w-full rounded-md border-gray-600 bg-slate-700 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-700/50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                        <button type="button" (click)="enregistrerNouveauJoueur()" class="inline-flex w-full justify-center rounded-md bg-amber-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-amber-500 sm:ml-3 sm:w-auto">Enregistrer</button>
+                        <button type="button" (click)="fermerModaleAjoutJoueur()" class="mt-3 inline-flex w-full justify-center rounded-md bg-slate-600 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-600 hover:bg-slate-500 sm:mt-0 sm:w-auto">Annuler</button>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-    } @empty {
-      <p class="col-span-full text-center text-gray-400 py-8">Aucun joueur ne correspond à ce filtre.</p>
     }
-  </div>
 </div>

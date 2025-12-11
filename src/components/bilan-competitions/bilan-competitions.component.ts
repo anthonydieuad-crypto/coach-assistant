@@ -1,41 +1,31 @@
-
-import { ChangeDetectionStrategy, Component, computed, inject, Input } from '@angular/core';
-import { Joueur } from '../../models/joueur.model';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { JoueurService } from '../../services/joueur.service';
 import { EvenementService } from '../../services/evenement.service';
-import { EvenementCalendrier } from '../../models/evenement.model';
 
 @Component({
   selector: 'app-bilan-competitions',
   standalone: true,
+  imports: [],
   templateUrl: './bilan-competitions.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BilanCompetitionsComponent {
-  @Input({ required: true }) joueurs: Joueur[] = [];
-
+  private joueurService = inject(JoueurService);
   private evenementService = inject(EvenementService);
-  tousLesEvenements = this.evenementService.evenements;
 
+  // 👇 On récupère les signaux
+  joueurs = this.joueurService.joueurs;
+  evenements = this.evenementService.evenements;
+
+  // Filtre pour ne garder que les compétitions (Matchs, Plateaux, Tournois)
   evenementsCompetition = computed(() => {
-    return this.tousLesEvenements()
-      .filter(e => e.type === 'match' || e.type === 'plateau'|| e.type === 'tournoi')
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    return this.evenements().filter(e =>
+        e.type === 'match' || e.type === 'plateau' || e.type === 'tournoi'
+    );
   });
 
-  statsJoueur = computed(() => {
-    const evenements = this.evenementsCompetition();
-    return this.joueurs.map(joueur => {
-      const nombreConvocations = evenements.filter(e => e.participants.includes(joueur.id)).length;
-      return { ...joueur, nombreConvocations };
-    });
-  });
-
-  estJoueurParticipant(joueur: Joueur, evenement: EvenementCalendrier): boolean {
-    return evenement.participants.includes(joueur.id);
-  }
-
-  formaterDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+  // Helper pour compter les convocations d'un joueur
+  getNbConvocations(joueurId: number): number {
+    return this.evenementsCompetition().filter(e => e.participants.includes(joueurId)).length;
   }
 }

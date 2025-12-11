@@ -1,64 +1,59 @@
+<div class="p-6 min-h-screen text-gray-100">
+    <h2 class="text-2xl font-bold mb-6">Bilan des Présences</h2>
 
-<div class="p-4 sm:p-6">
-  <h2 class="text-2xl font-bold text-white mb-6">Bilan des Présences</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-slate-800/50 p-6 rounded-xl border border-white/10 shadow-lg">
+            <h3 class="text-gray-400 text-sm font-medium">Séances Totales</h3>
+            <p class="text-3xl font-bold text-white mt-2">{{ totalEntrainements() }}</p>
+        </div>
+        <div class="bg-slate-800/50 p-6 rounded-xl border border-white/10 shadow-lg">
+            <h3 class="text-gray-400 text-sm font-medium">Effectif Total</h3>
+            <p class="text-3xl font-bold text-amber-500 mt-2">{{ joueurs().length }}</p>
+        </div>
+    </div>
 
-  <div class="bg-slate-800/50 backdrop-blur-lg border border-white/10 rounded-lg shadow-lg overflow-x-auto">
-    <table class="min-w-full divide-y divide-white/10">
-      <thead class="bg-black/20">
-        <tr>
-          <th scope="col" class="sticky left-0 bg-slate-800/95 backdrop-blur-sm px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider z-10">
-            Joueur
-          </th>
-          @for (date of datesEntrainement(); track date) {
-            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider whitespace-nowrap">
-              {{ formaterDate(date) }}
-            </th>
-          }
-          <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider">
-            Prés.
-          </th>
-          <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-300 uppercase tracking-wider">
-            Abs.
-          </th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-white/10">
-        @for (joueur of statsJoueur(); track joueur.id) {
-          <tr class="hover:bg-white/10">
-            <td class="sticky left-0 bg-slate-800/95 backdrop-blur-sm px-6 py-4 whitespace-nowrap text-sm font-medium text-white z-10">
-              {{ joueur.prenom }} {{ joueur.nom }}
-            </td>
-            @for (date of datesEntrainement(); track date) {
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                @if (estJoueurPresent(joueur, date)) {
-                  <span class="text-lime-400 font-bold">✓</span>
-                } @else {
-                  <span class="text-rose-500 font-bold">✗</span>
-                }
-              </td>
-            }
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-center font-bold text-lime-400">
-              {{ joueur.presences }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-center font-bold text-rose-500">
-              {{ joueur.absences }}
-            </td>
-          </tr>
-        }
-      </tbody>
-      <tfoot class="border-t-2 border-white/20 bg-black/20">
-        <tr>
-          <th scope="row" class="sticky left-0 bg-slate-800/95 backdrop-blur-sm px-6 py-3 text-left text-xs font-bold text-gray-200 uppercase z-10">
-            Total Présents
-          </th>
-          @for (stat of statsDate(); track stat.date) {
-            <td class="px-6 py-3 text-center text-sm font-bold text-gray-200">
-              {{ stat.presents }}
-            </td>
-          }
-          <td colspan="2" class="px-6 py-3"></td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
+    <div class="bg-slate-800/50 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden shadow-xl">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                <tr class="bg-slate-900/50 text-gray-400 text-sm uppercase tracking-wider border-b border-white/10">
+                    <th class="p-4 font-semibold">Joueur</th>
+                    <th class="p-4 font-semibold text-center">Présences</th>
+                    <th class="p-4 font-semibold text-center">Absences</th>
+                    <th class="p-4 font-semibold text-right">Taux</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    @for (joueur of joueurs(); track joueur.id) {
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 font-medium text-white">
+                                {{ joueur.prenom }} {{ joueur.nom }}
+                                <div class="text-xs text-gray-500 font-normal">{{ joueur.groupe || 'Sans groupe' }}</div>
+                            </td>
+                            <td class="p-4 text-center text-emerald-400 font-bold">
+                                {{ joueur.presences.length }}
+                            </td>
+                            <td class="p-4 text-center text-rose-400 font-bold">
+                                {{ totalEntrainements() - joueur.presences.length }}
+                            </td>
+                            <td class="p-4 text-right">
+                                <div class="flex items-center justify-end gap-3">
+                  <span class="font-bold"
+                        [ngClass]="getTauxPresence(joueur) >= 0.75 ? 'text-emerald-400' : (getTauxPresence(joueur) >= 0.5 ? 'text-amber-400' : 'text-rose-400')">
+                    {{ getTauxPresence(joueur) | percent:'1.0-0' }}
+                  </span>
+                                    <div class="w-16 h-2 bg-slate-700 rounded-full overflow-hidden">
+                                        <div class="h-full rounded-full transition-all"
+                                             [style.width.%]="getTauxPresence(joueur) * 100"
+                                             [ngClass]="getTauxPresence(joueur) >= 0.75 ? 'bg-emerald-500' : (getTauxPresence(joueur) >= 0.5 ? 'bg-amber-500' : 'bg-rose-500')">
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

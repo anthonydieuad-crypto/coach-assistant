@@ -32,7 +32,8 @@ export class JoueurService {
     }
 
     ajouterJoueur(donneesJoueur: Omit<Joueur, 'id' | 'historiqueJongles' | 'presences' | 'photoUrl'>) {// Le backend gère l'ID, la photo par défaut, etc.
-        this.http.post<Joueur>(this.apiUrl, donneesJoueur).subscribe({            next: (nouveauJoueur) => {
+        this.http.post<Joueur>(this.apiUrl, donneesJoueur).subscribe({
+            next: (nouveauJoueur) => {
                 this.etatJoueurs.update(liste => [...liste, nouveauJoueur]);
             },
             error: (err) => console.error('Erreur ajout joueur:', err)
