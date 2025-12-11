@@ -44,7 +44,8 @@
                   [class.bg-sky-500]="evenement.type === 'training'" [class.hover:ring-sky-400]="evenement.type === 'training'"
                   [class.bg-emerald-500]="evenement.type === 'plateau'" [class.hover:ring-emerald-400]="evenement.type === 'plateau'"
                   [class.bg-rose-500]="evenement.type === 'match'" [class.hover:ring-rose-400]="evenement.type === 'match'"
-                  [class.bg-orange-500]="evenement.type === 'cohesion'" [class.hover:ring-orange-400]="evenement.type === 'cohesion'">
+                  [class.bg-orange-500]="evenement.type === 'cohesion'" [class.hover:ring-orange-400]="evenement.type === 'cohesion'"
+                  [class.bg-purple-500]="evenement.type === 'tournoi'" [class.hover:ring-purple-400]="evenement.type === 'tournoi'">
                 <div class="font-semibold truncate">{{ evenement.titre }}</div>
                 <div class="text-white/90 truncate"><span class="font-medium">@</span> {{ evenement.lieu }}</div>
                 @if (evenement.equipesAdverses) {
@@ -74,6 +75,7 @@
               <option value="training">Entraînement</option>
               <option value="plateau">Plateau</option>
               <option value="match">Match amical</option>
+                <option value="tournoi">Tournoi</option>
               <option value="cohesion">Sortie cohésion d'équipe</option>
             </select>
           </div>
@@ -89,9 +91,8 @@
             <label for="event-location" class="block text-sm font-medium text-gray-300">Lieu</label>
             <input type="text" id="event-location" [value]="nouvelEvenement().lieu" (input)="gererSaisieEvenement('lieu', $event)" placeholder="ex: Stade Municipal" class="mt-1 block w-full px-3 py-2 bg-slate-900/50 border border-slate-500 rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500" required>
           </div>
-          
-          @if (nouvelEvenement().type === 'plateau' || nouvelEvenement().type === 'match') {
-            <div>
+
+            @if (nouvelEvenement().type === 'plateau' || nouvelEvenement().type === 'match' || nouvelEvenement().type === 'tournoi') {            <div>
               <label for="event-group" class="block text-sm font-medium text-gray-300">Groupe</label>
               <select id="event-group" [value]="nouvelEvenement().groupe ?? 'null'" (change)="gererSaisieEvenement('groupe', $event)" class="mt-1 block w-full px-3 py-2 bg-slate-900/50 border border-slate-500 rounded-md shadow-sm">
                 <option value="null">Aucun</option>

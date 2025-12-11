@@ -43,7 +43,7 @@ export class DetailJoueurComponent implements OnInit {
 
   evenementsConvocation = computed(() => {
     return this.tousLesEvenements().filter(event => 
-      (event.type === 'plateau' || event.type === 'match') && event.participants.includes(this.joueur.id)
+      (event.type === 'plateau' || event.type === 'match'|| event.type === 'tournoi') && event.participants.includes(this.joueur.id)
     );
   });
 

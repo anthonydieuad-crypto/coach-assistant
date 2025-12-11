@@ -97,7 +97,8 @@ export class CalendrierComponent {
         training: 'Entraînement',
         plateau: 'Plateau',
         match: 'Match amical',
-        cohesion: "Sortie cohésion d'équipe"
+        cohesion: "Sortie cohésion d'équipe",
+        tournoi : "Tournoi"
     };
     const dateFormatee = new Date(date).toLocaleDateString('fr-FR', { timeZone: 'UTC', day: '2-digit', month: '2-digit', year: 'numeric' });
     return `${libellesType[type]} du ${dateFormatee}`;
@@ -141,7 +142,7 @@ export class CalendrierComponent {
         if (field === 'date' || field === 'type') {
             misAJour.titre = this.genererTitre(misAJour.type as TypeEvenement, misAJour.date);
         }
-        if (field === 'type' && value !== 'match' && value !== 'plateau') {
+        if (field === 'type' && value !== 'match' && value !== 'plateau'&& value !== 'tournoi') {
             misAJour.equipesAdverses = '';
             misAJour.participants = [];
             misAJour.groupe = undefined;

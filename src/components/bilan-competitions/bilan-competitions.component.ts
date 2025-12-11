@@ -18,7 +18,7 @@ export class BilanCompetitionsComponent {
 
   evenementsCompetition = computed(() => {
     return this.tousLesEvenements()
-      .filter(e => e.type === 'match' || e.type === 'plateau')
+      .filter(e => e.type === 'match' || e.type === 'plateau'|| e.type === 'tournoi')
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   });
 

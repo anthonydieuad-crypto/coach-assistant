@@ -1,6 +1,6 @@
 import { GroupeJoueur } from './joueur.model';
 
-export type TypeEvenement = 'training' | 'plateau' | 'match' | 'cohesion';
+export type TypeEvenement = 'training' | 'plateau' | 'match' | 'cohesion' | 'tournoi';
 
 export interface EvenementCalendrier {
   id: number;
