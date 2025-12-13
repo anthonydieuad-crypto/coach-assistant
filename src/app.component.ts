@@ -1,5 +1,6 @@
-import {ChangeDetectionStrategy, Component, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
 import {RouterLink, RouterLinkActive, RouterOutlet} from "@angular/router";
+import {AuthService} from "@/src/services/auth.service";
 
 @Component({
     selector: 'app-root',
@@ -14,6 +15,7 @@ import {RouterLink, RouterLinkActive, RouterOutlet} from "@angular/router";
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
+    authService = inject(AuthService);
     isMobileMenuOpen = signal(false);
 
     toggleMobileMenu() {

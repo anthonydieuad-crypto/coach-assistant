@@ -1,5 +1,5 @@
 <div class="min-h-screen text-gray-100 font-sans pb-10">
-
+    @if (authService.utilisateurConnecte()) {
     <nav class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 shadow-lg">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -50,6 +50,7 @@
             </div>
         }
     </nav>
+    }
 
     <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <router-outlet></router-outlet>

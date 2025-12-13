@@ -1,0 +1,26 @@
+<div class="min-h-screen flex items-center justify-center bg-slate-900 p-4">
+    <div class="bg-slate-800 p-8 rounded-xl shadow-2xl w-full max-w-md border border-white/10">
+        <h1 class="text-3xl font-bold text-amber-500 mb-6 text-center">COACH ASSIST</h1>
+
+        <form (submit)="$event.preventDefault(); seConnecter()" class="space-y-6">
+            <div>
+                <label class="text-gray-300 text-sm font-bold block mb-2">Email</label>
+                <input type="email" [ngModel]="email()" (ngModelChange)="email.set($event)" name="email"
+                       class="w-full bg-slate-700 text-white rounded-lg p-3 border border-slate-600 focus:border-amber-500 outline-none">
+            </div>
+            <div>
+                <label class="text-gray-300 text-sm font-bold block mb-2">Mot de passe</label>
+                <input type="password" [ngModel]="password()" (ngModelChange)="password.set($event)" name="password"
+                       class="w-full bg-slate-700 text-white rounded-lg p-3 border border-slate-600 focus:border-amber-500 outline-none">
+            </div>
+
+            @if (erreur()) {
+                <p class="text-rose-500 text-sm text-center font-bold">{{ erreur() }}</p>
+            }
+
+            <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-lg transition-colors">
+                Entrer dans le vestiaire ⚽
+            </button>
+        </form>
+    </div>
+</div>
