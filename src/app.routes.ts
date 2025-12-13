@@ -10,11 +10,9 @@ import {BilanCompetitionsComponent} from "@/src/components/bilan-competitions/bi
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent }, // Accès libre
-
-    // 👇 Tout le reste est protégé
     {
         path: '',
-        canActivate: [authGuard], // 🛡️ Protection activée
+        canActivate: [authGuard],
         children: [
             { path: '', redirectTo: 'calendrier', pathMatch: 'full' },
             { path: 'calendrier', component: CalendrierComponent },
