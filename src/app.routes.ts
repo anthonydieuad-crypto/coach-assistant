@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from '@/src/components/login/login';
-import { authGuard } from './guards/auth-guard';
+import { authGuard } from './guards/auth.guard';
 import {CalendrierComponent} from "@/src/components/calendrier/calendrier.component";
 import {SuiviPresencesComponent} from "@/src/components/suivi-presences/suivi-presences.component";
 import {ListeJoueursComponent} from "@/src/components/liste-joueurs/liste-joueurs.component";
