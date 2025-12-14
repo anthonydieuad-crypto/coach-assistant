@@ -1,0 +1,51 @@
+<div class="min-h-screen flex items-center justify-center bg-slate-900 p-4">
+    <div class="bg-slate-800 p-8 rounded-xl shadow-2xl w-full max-w-md border border-white/10 animate-fade-in">
+        <h1 class="text-3xl font-bold text-amber-500 mb-2 text-center">Rejoindre le Staff</h1>
+        <p class="text-gray-400 text-center mb-6 text-sm">Créez votre compte entraîneur</p>
+
+        <form (submit)="$event.preventDefault(); sInscrire()" class="space-y-4">
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-gray-300 text-sm font-bold block mb-1">Prénom</label>
+                    <input type="text" [ngModel]="prenom()" (ngModelChange)="prenom.set($event)" name="prenom"
+                           class="w-full bg-slate-700 text-white rounded-lg p-3 border border-slate-600 focus:border-amber-500 outline-none transition-colors" placeholder="Zinedine">
+                </div>
+                <div>
+                    <label class="text-gray-300 text-sm font-bold block mb-1">Nom</label>
+                    <input type="text" [ngModel]="nom()" (ngModelChange)="nom.set($event)" name="nom"
+                           class="w-full bg-slate-700 text-white rounded-lg p-3 border border-slate-600 focus:border-amber-500 outline-none transition-colors" placeholder="Zidane">
+                </div>
+            </div>
+
+            <div>
+                <label class="text-gray-300 text-sm font-bold block mb-1">Email</label>
+                <input type="email" [ngModel]="email()" (ngModelChange)="email.set($event)" name="email"
+                       class="w-full bg-slate-700 text-white rounded-lg p-3 border border-slate-600 focus:border-amber-500 outline-none transition-colors" placeholder="coach@club.com">
+            </div>
+
+            <div>
+                <label class="text-gray-300 text-sm font-bold block mb-1">Mot de passe</label>
+                <input type="password" [ngModel]="password()" (ngModelChange)="password.set($event)" name="password"
+                       class="w-full bg-slate-700 text-white rounded-lg p-3 border border-slate-600 focus:border-amber-500 outline-none transition-colors" placeholder="••••••••">
+            </div>
+
+            @if (erreur()) {
+                <div class="bg-rose-500/10 border border-rose-500/50 rounded-lg p-3">
+                    <p class="text-rose-500 text-sm text-center font-bold">{{ erreur() }}</p>
+                </div>
+            }
+
+            <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-lg transition-colors shadow-lg mt-2">
+                Créer mon compte
+            </button>
+        </form>
+
+        <div class="mt-6 text-center border-t border-white/10 pt-4">
+            <p class="text-gray-400 text-sm">Déjà un compte ?</p>
+            <a routerLink="/login" class="text-amber-500 hover:text-amber-400 font-semibold cursor-pointer transition-colors">
+                Se connecter
+            </a>
+        </div>
+    </div>
+</div>

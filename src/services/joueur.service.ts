@@ -1,43 +1,59 @@
-import {inject, Injectable, signal} from '@angular/core';
-import {Joueur} from '../models/joueur.model';
-import {environment} from "./../environments/environment";
-import {HttpClient} from "@angular/common/http";
+import { inject, Injectable, signal, effect } from '@angular/core';
+import { Joueur } from '../models/joueur.model';
+import { environment } from "./../environments/environment";
+import { HttpClient } from "@angular/common/http";
+import { AuthService } from "./auth.service";
 
 @Injectable({
     providedIn: 'root',
 })
 export class JoueurService {
-    private http = inject(HttpClient)
+    private http = inject(HttpClient);
+    private authService = inject(AuthService); // 👇 On récupère l'info du coach
     private apiUrl = `${environment.apiUrl}/joueurs`;
 
     private etatJoueurs = signal<Joueur[]>([]);
-
     joueurs = this.etatJoueurs.asReadonly();
 
     constructor() {
-        this.chargerJoueurs();
+        // 👇 Astuce : Dès que l'utilisateur change (connexion/déconnexion), on recharge la bonne liste
+        effect(() => {
+            if (this.authService.utilisateurConnecte()) {
+                this.chargerJoueurs();
+            } else {
+                this.etatJoueurs.set([]); // Si déconnecté, on vide la liste
+            }
+        });
     }
 
-    // Récupérer tous les joueurs du back
-
     chargerJoueurs() {
-        this.http.get<Joueur[]>(this.apiUrl).subscribe({
+        const user = this.authService.utilisateurConnecte();
+        if (!user) return;
+
+        // 👇 On ajoute ?coachId=123 à la requête
+        this.http.get<Joueur[]>(`${this.apiUrl}?coachId=${user.id}`).subscribe({
             next: (data) => this.etatJoueurs.set(data),
             error: (err) => console.error('Erreur chargement joueurs', err)
         });
     }
 
-    getJoueurParId(id: number): Joueur | undefined {
-        return this.joueurs().find((p) => p.id === id);
-    }
+    ajouterJoueur(donneesJoueur: Omit<Joueur, 'id' | 'historiqueJongles' | 'presences' | 'photoUrl'>) {
+        const user = this.authService.utilisateurConnecte();
+        if (!user) return;
 
-    ajouterJoueur(donneesJoueur: Omit<Joueur, 'id' | 'historiqueJongles' | 'presences' | 'photoUrl'>) {// Le backend gère l'ID, la photo par défaut, etc.
-        this.http.post<Joueur>(this.apiUrl, donneesJoueur).subscribe({
+        // 👇 On précise à quel coach appartient ce nouveau joueur
+        this.http.post<Joueur>(`${this.apiUrl}?coachId=${user.id}`, donneesJoueur).subscribe({
             next: (nouveauJoueur) => {
                 this.etatJoueurs.update(liste => [...liste, nouveauJoueur]);
             },
             error: (err) => console.error('Erreur ajout joueur:', err)
         });
+    }
+
+    // --- Le reste ne change pas (Update/Delete utilisent l'ID du joueur, c'est suffisant) ---
+
+    getJoueurParId(id: number): Joueur | undefined {
+        return this.joueurs().find((p) => p.id === id);
     }
 
     mettreAJourJoueur(joueur: Joueur) {
@@ -61,11 +77,9 @@ export class JoueurService {
     }
 
     ajouterScoreJongle(joueurId: number, date: string, score: number) {
-        // On utilise l'endpoint spécifique du backend
         const body = {date, score};
         this.http.post<Joueur>(`${this.apiUrl}/${joueurId}/jongles`, body).subscribe({
             next: (joueurMaj) => {
-                // Le backend renvoie le joueur complet avec son nouvel historique
                 this.etatJoueurs.update(liste =>
                     liste.map(p => p.id === joueurId ? joueurMaj : p)
                 );
@@ -75,24 +89,10 @@ export class JoueurService {
     }
 
     enregistrerPresences(joueurIds: number[], date: string) {
-        // Note: Ton backend a un endpoint "basculerPresence" (toggle).
-        // Pour simplifier ici, on va recharger tous les joueurs après modification,
-        // ou idéalement, il faudrait un endpoint backend "setPresences" pour faire ça en masse.
-
-        // Solution temporaire : On appelle le toggle pour chaque joueur concerné
-        // (C'est pas optimal niveau performance réseau mais ça marche avec ton back actuel)
-
-        // Une meilleure approche serait de créer un endpoint "batch" côté Java.
-        // Pour l'instant, disons qu'on rafraîchit tout :
-
-        // Exemple simple : On boucle (attention c'est brutal pour le réseau)
         joueurIds.forEach(id => {
             this.http.post<Joueur>(`${this.apiUrl}/${id}/presence?date=${date}`, {}).subscribe(
-                () => this.chargerJoueurs() // On recharge tout pour être sûr d'être synchro
+                () => this.chargerJoueurs()
             );
         });
     }
 }
-
-
-

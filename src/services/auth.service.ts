@@ -16,13 +16,18 @@ export interface UtilisateurConnecte {
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private apiUrl = `${environment.apiUrl}/auth/login`;
+  private apiUrl = `${environment.apiUrl}/auth`; // J'ai raccourci ici pour pouvoir utiliser /login et /register
 
   // Signal pour savoir si on est connecté (accessible partout)
   utilisateurConnecte = signal<UtilisateurConnecte | null>(this.recupererDepuisStorage());
 
   login(email: string, mdp: string) {
-    return this.http.post<UtilisateurConnecte>(this.apiUrl, { email, password: mdp });
+    return this.http.post<UtilisateurConnecte>(`${this.apiUrl}/login`, { email, password: mdp });
+  }
+
+  // 👇 NOUVELLE MÉTHODE
+  inscription(nom: string, prenom: string, email: string, mdp: string) {
+    return this.http.post<UtilisateurConnecte>(`${this.apiUrl}/register`, { nom, prenom, email, password: mdp });
   }
 
   // Stocker la session quand la connexion réussit

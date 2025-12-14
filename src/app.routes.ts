@@ -1,15 +1,19 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from '@/src/components/login/login';
+import { SignupComponent } from '@/src/components/signup/signup.component';
+import { ProfilComponent } from '@/src/components/profil/profil.component'; // 👈 Import
 import { authGuard } from './guards/auth.guard';
-import {CalendrierComponent} from "@/src/components/calendrier/calendrier.component";
-import {SuiviPresencesComponent} from "@/src/components/suivi-presences/suivi-presences.component";
-import {ListeJoueursComponent} from "@/src/components/liste-joueurs/liste-joueurs.component";
-import {DetailJoueurComponent} from "@/src/components/detail-joueur/detail-joueur.component";
-import {BilanPresencesComponent} from "@/src/components/bilan-presences/bilan-presences.component";
-import {BilanCompetitionsComponent} from "@/src/components/bilan-competitions/bilan-competitions.component"; // 👈 Import du gardien
+import { CalendrierComponent } from "@/src/components/calendrier/calendrier.component";
+import { SuiviPresencesComponent } from "@/src/components/suivi-presences/suivi-presences.component";
+import { ListeJoueursComponent } from "@/src/components/liste-joueurs/liste-joueurs.component";
+import { DetailJoueurComponent } from "@/src/components/detail-joueur/detail-joueur.component";
+import { BilanPresencesComponent } from "@/src/components/bilan-presences/bilan-presences.component";
+import { BilanCompetitionsComponent } from "@/src/components/bilan-competitions/bilan-competitions.component";
 
 export const routes: Routes = [
-    { path: 'login', component: LoginComponent }, // Accès libre
+    { path: 'login', component: LoginComponent },
+    { path: 'signup', component: SignupComponent },
+
     {
         path: '',
         canActivate: [authGuard],
@@ -21,6 +25,7 @@ export const routes: Routes = [
             { path: 'joueurs/:id', component: DetailJoueurComponent },
             { path: 'bilan-presences', component: BilanPresencesComponent },
             { path: 'bilan-competitions', component: BilanCompetitionsComponent },
+            { path: 'profil', component: ProfilComponent }, // 👈 Nouvelle route ici
         ]
     },
 
