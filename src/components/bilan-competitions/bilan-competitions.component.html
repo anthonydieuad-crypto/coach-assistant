@@ -2,8 +2,8 @@
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold">Bilan Compétitions</h2>
         <span class="bg-slate-800 border border-amber-500/30 text-amber-500 px-3 py-1 rounded-full text-sm font-medium">
-      {{ evenementsCompetition().length }} Événements joués
-    </span>
+            Matchs, Plateaux & Tournois
+        </span>
     </div>
 
     <div class="bg-slate-800/50 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden shadow-xl">
@@ -12,35 +12,64 @@
                 <thead>
                 <tr class="bg-slate-900/50 text-gray-400 text-sm uppercase tracking-wider border-b border-white/10">
                     <th class="p-4 font-semibold">Joueur</th>
-                    <th class="p-4 font-semibold text-center">Convocations</th>
-                    <th class="p-4 font-semibold text-center">Taux de participation</th>
+                    <th class="p-4 font-semibold text-center w-48">Taux de Présence</th>
+                    <th class="p-4 font-semibold text-center text-blue-400">Équipe 1</th>
+                    <th class="p-4 font-semibold text-center text-purple-400">Équipe 2</th>
+                    <th class="p-4 font-semibold text-center text-orange-400">Équipe 3</th>
                 </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
-                    @for (joueur of joueurs(); track joueur.id) {
+                    @for (stat of statsJoueurs(); track stat.joueur.id) {
                         <tr class="hover:bg-white/5 transition-colors">
                             <td class="p-4 font-medium text-white">
-                                {{ joueur.prenom }} {{ joueur.nom }}
+                                {{ stat.joueur.prenom }} {{ stat.joueur.nom }}
+                                <div class="text-xs text-gray-500 font-normal">
+                                    {{ stat.joueur.groupe || 'Sans groupe' }}
+                                </div>
                             </td>
-                            <td class="p-4 text-center">
-                <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-700 text-white font-bold border border-white/10">
-                  {{ getNbConvocations(joueur.id) }}
-                </span>
-                            </td>
-                            <td class="p-4 text-center">
-                                @if (evenementsCompetition().length > 0) {
-                                    <div class="flex items-center justify-center gap-2">
-                                        <div class="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
-                                            <div class="h-full bg-sky-500 rounded-full"
-                                                 [style.width.%]="(getNbConvocations(joueur.id) / evenementsCompetition().length) * 100">
-                                            </div>
-                                        </div>
-                                        <span class="text-xs text-gray-400">
-                       {{ ((getNbConvocations(joueur.id) / evenementsCompetition().length) * 100).toFixed(0) }}%
-                     </span>
+
+                            <td class="p-4">
+                                <div class="flex flex-col justify-center h-full">
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="font-bold text-white">{{ stat.pourcentage | percent:'1.0-0' }}</span>
+                                        <span class="text-gray-500">{{ stat.nbJoursPresents }} dates</span>
                                     </div>
+                                    <div class="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                                        <div class="h-full rounded-full transition-all duration-500"
+                                             [style.width.%]="stat.pourcentage * 100"
+                                             [ngClass]="stat.pourcentage >= 0.75 ? 'bg-emerald-500' : (stat.pourcentage >= 0.5 ? 'bg-amber-500' : 'bg-rose-500')">
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="p-4 text-center">
+                                @if (stat.details.grp1 > 0) {
+                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 font-bold border border-blue-500/30">
+                                        {{ stat.details.grp1 }}
+                                    </span>
                                 } @else {
-                                    <span class="text-gray-500 text-sm">-</span>
+                                    <span class="text-gray-600">-</span>
+                                }
+                            </td>
+
+                            <td class="p-4 text-center">
+                                @if (stat.details.grp2 > 0) {
+                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 font-bold border border-purple-500/30">
+                                        {{ stat.details.grp2 }}
+                                    </span>
+                                } @else {
+                                    <span class="text-gray-600">-</span>
+                                }
+                            </td>
+
+                            <td class="p-4 text-center">
+                                @if (stat.details.grp3 > 0) {
+                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-orange-500/20 text-orange-400 font-bold border border-orange-500/30">
+                                        {{ stat.details.grp3 }}
+                                    </span>
+                                } @else {
+                                    <span class="text-gray-600">-</span>
                                 }
                             </td>
                         </tr>
