@@ -34,11 +34,7 @@ export class ListeJoueursComponent {
   });
 
   totalEntrainements = computed(() => {
-    const datesEntrainement = new Set<string>();
-    this.joueurs().forEach(joueur => {
-      joueur.presences.forEach(date => datesEntrainement.add(date));
-    });
-    return datesEntrainement.size;
+    return this.tousLesEvenements().filter(e => e.type === 'training').length;
   });
 
   // 4. Logique d'AJOUT (récupérée de AppComponent)
@@ -110,6 +106,12 @@ export class ListeJoueursComponent {
   getPourcentagePresence(joueur: Joueur): number {
     const total = this.totalEntrainements();
     if (total === 0) return 0;
-    return Math.round((joueur.presences.length / total) * 100);
+
+    // On compte combien de fois le joueur apparaît dans les participants des entraînements
+    const nbPresences = this.tousLesEvenements().filter(e =>
+        e.type === 'training' && e.participants.includes(joueur.id)
+    ).length;
+
+    return Math.round((nbPresences / total) * 100);
   }
 }
