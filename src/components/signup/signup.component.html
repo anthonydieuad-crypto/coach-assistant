@@ -36,8 +36,15 @@
                 </div>
             }
 
-            <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-lg transition-colors shadow-lg mt-2">
-                Créer mon compte
+            <button type="submit"
+                    [disabled]="isLoading()"
+                    class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-lg transition-colors shadow-lg mt-2 flex items-center justify-center">
+
+                @if (isLoading()) {
+                    <span class="spinner"></span> Création en cours...
+                } @else {
+                    Créer mon compte
+                }
             </button>
         </form>
 

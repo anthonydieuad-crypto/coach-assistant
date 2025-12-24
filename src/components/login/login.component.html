@@ -18,8 +18,15 @@
                 <p class="text-rose-500 text-sm text-center font-bold">{{ erreur() }}</p>
             }
 
-            <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-lg transition-colors">
-                Entrer dans le vestiaire ⚽
+            <button type="submit"
+                    [disabled]="isLoading()"
+                    class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-lg transition-colors flex items-center justify-center">
+
+                @if (isLoading()) {
+                    <span class="spinner"></span> Connexion...
+                } @else {
+                    Entrer dans le vestiaire ⚽
+                }
             </button>
         </form>
 

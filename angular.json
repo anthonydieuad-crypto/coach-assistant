@@ -12,6 +12,9 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "styles": [
+              "src/styles.css"
+            ],
             "outputPath": {
               "base": "./dist",
               "browser": "."
