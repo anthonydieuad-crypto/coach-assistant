@@ -44,7 +44,7 @@ export class CalendrierComponent implements OnInit{
         if (brouillon) {
             this.nouvelEvenement.set({
                 titre: brouillon.titre || 'Entraînement',
-                date: brouillon.date || new Date().toISOString().split('T')[0],
+                date: brouillon.date || this.formaterDatePourApi(new Date()),
                 type: 'training', // On force le type entraînement
                 lieu: brouillon.lieu || '',
                 participants: brouillon.participants || [], // ✅ On récupère les joueurs

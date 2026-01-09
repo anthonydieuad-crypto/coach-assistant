@@ -130,11 +130,17 @@ export class DetailJoueurComponent implements OnInit {
   }
 
   ajouterScore(valeur: string) {
-    const score = parseInt(valeur);
-    const j = this.joueur();
-    if (j && !isNaN(score)) {
-      const dateDuJour = new Date().toISOString().split('T')[0];
-      this.joueurService.ajouterScoreJongle(j.id, dateDuJour, score);
-    }
+      const score = parseInt(valeur);
+      const j = this.joueur();
+      if (j && !isNaN(score)) {
+          // 👇 Correction date locale
+          const today = new Date();
+          const annee = today.getFullYear();
+          const mois = String(today.getMonth() + 1).padStart(2, '0');
+          const jour = String(today.getDate()).padStart(2, '0');
+          const dateDuJour = `${annee}-${mois}-${jour}`;
+
+          this.joueurService.ajouterScoreJongle(j.id, dateDuJour, score);
+      }
   }
 }
