@@ -25,6 +25,9 @@ export class JoueurService {
             }
         });
     }
+    getJoueurByIdHttp(id: number) {
+        return this.http.get<Joueur>(`${this.apiUrl}/${id}`);
+    }
 
     chargerJoueurs() {
         const user = this.authService.utilisateurConnecte();

@@ -68,17 +68,21 @@ export class DetailJoueurComponent implements OnInit {
   // --- INIT ---
 
   ngOnInit() {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    const joueurTrouve = this.joueurService.joueurs().find(j => j.id === id);
+      const id = Number(this.route.snapshot.paramMap.get('id'));
 
-    if (joueurTrouve) {
-      this.joueur.set(joueurTrouve);
-    } else {
-      this.router.navigate(['/joueurs']);
-    }
+      // 1. On cherche d'abord dans la liste locale (si on vient de la page liste)
+      const joueurTrouve = this.joueurService.joueurs().find(j => j.id === id);
+
+      if (joueurTrouve) {
+          this.joueur.set(joueurTrouve);
+      } else {
+          // 2. 🛑 Si pas trouvé (ex: F5), on demande au serveur au lieu de rediriger
+          this.joueurService.getJoueurByIdHttp(id).subscribe({
+              next: (j) => this.joueur.set(j), // ✅ Trouvé ! On l'affiche
+              error: () => this.router.navigate(['/joueurs']) // ❌ Vraiment introuvable, là on redirige
+          });
+      }
   }
-
-  // --- ACTIONS ---
 
   changerFiltre(type: 'all' | 'match' | 'plateau' | 'tournoi') {
     this.filtreActif.set(type);

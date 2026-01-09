@@ -22,7 +22,7 @@ export class AppComponent {
         this.isMobileMenuOpen.update(v => !v);
     }
 
-    closeMobilMenu() {
+    closeMobileMenu() {
         this.isMobileMenuOpen.set(false);
     }
 }
