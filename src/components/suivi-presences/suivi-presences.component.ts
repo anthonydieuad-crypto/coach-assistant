@@ -20,13 +20,18 @@ export class SuiviPresencesComponent {
   joueurs = this.joueurService.joueurs;
 
 // On crée une date locale "propre"
-const today = new Date();
-const annee = today.getFullYear();
-const mois = String(today.getMonth() + 1).padStart(2, '0');
-const jour = String(today.getDate()).padStart(2, '0');
+dateEntrainement = signal(this.formatDateAujourdhui());
+joueursSelectionnes = signal<Set<number>>(new Set());
 
+private formatDateAujourdhui(): string {
+const today = new Date();
+    const annee = today.getFullYear();
+    const mois = String(today.getMonth() + 1).padStart(2, '0');
+    const jour = String(today.getDate()).padStart(2, '0');
+
+    return `${annee}-${mois}-${jour}`;
+  }
 // Initialisation avec la date locale
-dateEntrainement = signal(`${annee}-${mois}-${jour}`);  joueursSelectionnes = signal<Set<number>>(new Set());
 
   constructor() {
     effect(() => {

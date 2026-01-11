@@ -55,6 +55,15 @@
     }
 
     <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        @if (loaderService.isLoading()) {
+        <div class="loader-overlay">
+            <div class="loader-content">
+                <div class="spinner"></div>
+
+                <div class="loading-text">Chargement...</div>
+            </div>
+        </div>
+        }
         <router-outlet></router-outlet>
     </main>
 
