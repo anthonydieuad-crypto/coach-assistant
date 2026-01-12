@@ -4,6 +4,7 @@ import { JoueurService } from '../../services/joueur.service';
 import { EvenementService } from '../../services/evenement.service';
 import { GroupeJoueur, Joueur } from '../../models/joueur.model';
 import {Router} from "@angular/router";
+import { ToastrService } from 'ngx-toastr';
 
 type FiltreGroupeJoueur = 'all' | 'Equipe 1' | 'Equipe 2' | 'Equipe 3' | 'none';
 
@@ -18,6 +19,7 @@ export class ListeJoueursComponent {
   private joueurService = inject(JoueurService);
   private evenementService = inject(EvenementService);
   private router = inject(Router);
+  private toastr = inject(ToastrService);
 
   // 2. On récupère les données directement depuis les services
   joueurs = this.joueurService.joueurs;
@@ -72,16 +74,20 @@ export class ListeJoueursComponent {
   }
 
   // Sauvegarde
-  enregistrerNouveauJoueur() {
-    const j = this.nouveauJoueur();
-    // Validation simple
-    if (j.prenom && j.nom) {
-      this.joueurService.ajouterJoueur(j);
-      this.fermerModaleAjoutJoueur();
-    } else {
-      alert("Le prénom et le nom sont obligatoires.");
-    }
-  }
+ enregistrerNouveauJoueur() {
+     const j = this.nouveauJoueur();
+     if (j.prenom && j.nom) {
+       this.joueurService.ajouterJoueur(j).subscribe({
+           next: () => {
+               this.toastr.success(`${j.prenom} a rejoint l'équipe !`, 'Bienvenue');
+               this.fermerModaleAjoutJoueur();
+           },
+           error: () => this.toastr.error('Erreur lors de la création', 'Oups')
+       });
+     } else {
+       this.toastr.warning("Le prénom et le nom sont obligatoires.", "Attention");
+     }
+   }
 
   // Gestion des champs du formulaire
   gererSaisieNouveauJoueur(field: string, event: Event) {
@@ -92,10 +98,13 @@ export class ListeJoueursComponent {
 
   // Suppression
   gererSupprimerJoueur(joueur: Joueur) {
-    if (confirm(`Êtes-vous sûr de vouloir supprimer ${joueur.prenom} ${joueur.nom} ?`)) {
-      this.joueurService.supprimerJoueur(joueur.id);
+      if (confirm(`Êtes-vous sûr de vouloir supprimer ${joueur.prenom} ${joueur.nom} ?`)) {
+        this.joueurService.supprimerJoueur(joueur.id).subscribe({
+            next: () => this.toastr.info(`${joueur.prenom} a été supprimé`, 'Suppression'),
+            error: () => this.toastr.error('Impossible de supprimer', 'Erreur')
+        });
+      }
     }
-  }
 
   // Helpers Stats
   getMaxJongles(joueur: Joueur): number {

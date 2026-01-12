@@ -6,7 +6,7 @@
 .animate-fade-in {
   animation: fade-in 0.2s ease-out forwards;
 }
-./* Le fond gris transparent */
+/* Le fond gris transparent */
  .loader-overlay {
    position: fixed;
    top: 0; left: 0; width: 100%; height: 100%;

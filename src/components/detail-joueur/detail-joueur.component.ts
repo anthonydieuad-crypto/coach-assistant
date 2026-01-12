@@ -6,6 +6,7 @@ import { JoueurService } from '../../services/joueur.service';
 import { EvenementService } from '../../services/evenement.service';
 import { Joueur } from '../../models/joueur.model';
 import { GraphiqueJonglesComponent } from '../graphique-jongles/graphique-jongles.component';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-detail-joueur',
@@ -18,6 +19,7 @@ export class DetailJoueurComponent implements OnInit {
   private router = inject(Router);
   public joueurService = inject(JoueurService);
   private evenementService = inject(EvenementService);
+  private toastr = inject(ToastrService);
 
   joueur = signal<Joueur | undefined>(undefined);
 
@@ -109,38 +111,50 @@ export class DetailJoueurComponent implements OnInit {
     this.modeEdition.set(false);
   }
 
-  sauvegarderModification() {
-    const modifs = this.editionForm();
-    const original = this.joueur();
+ sauvegarderModification() {
+     const modifs = this.editionForm();
+     const original = this.joueur();
 
-    if (modifs && original) {
-      const joueurAjour: Joueur = { ...original, ...modifs } as Joueur;
-      this.joueurService.mettreAJourJoueur(joueurAjour);
-      this.joueur.set(joueurAjour);
-      this.modeEdition.set(false);
-    }
-  }
+     if (modifs && original) {
+       const joueurAjour: Joueur = { ...original, ...modifs } as Joueur;
+
+       this.joueurService.mettreAJourJoueur(joueurAjour).subscribe({
+           next: () => {
+               this.joueur.set(joueurAjour);
+               this.modeEdition.set(false);
+               this.toastr.success('Profil mis à jour avec succès', 'Modification');
+           },
+           error: () => this.toastr.error('Erreur lors de la mise à jour', 'Oups')
+       });
+     }
+   }
 
   supprimerJoueur() {
-    const j = this.joueur();
-    if (j && confirm('Voulez-vous vraiment supprimer ce joueur ?')) {
-      this.joueurService.supprimerJoueur(j.id);
-      this.router.navigate(['/joueurs']);
+      const j = this.joueur();
+      if (j && confirm(`Voulez-vous vraiment supprimer ${j.prenom} ${j.nom} ?`)) {
+        this.joueurService.supprimerJoueur(j.id).subscribe({
+            next: () => {
+                this.toastr.info('Joueur supprimé de l\'effectif', 'Suppression');
+                this.router.navigate(['/joueurs']);
+            },
+            error: () => this.toastr.error('Impossible de supprimer le joueur', 'Erreur')
+        });
+      }
     }
-  }
 
   ajouterScore(valeur: string) {
-      const score = parseInt(valeur);
-      const j = this.joueur();
-      if (j && !isNaN(score)) {
-          // 👇 Correction date locale
-          const today = new Date();
-          const annee = today.getFullYear();
-          const mois = String(today.getMonth() + 1).padStart(2, '0');
-          const jour = String(today.getDate()).padStart(2, '0');
-          const dateDuJour = `${annee}-${mois}-${jour}`;
+        const score = parseInt(valeur);
+        const j = this.joueur();
+        if (j && !isNaN(score)) {
+            const today = new Date().toISOString().split('T')[0];
 
-          this.joueurService.ajouterScoreJongle(j.id, dateDuJour, score);
-      }
+            this.joueurService.ajouterScoreJongle(j.id, today, score).subscribe({
+                next: (joueurMaj) => {
+                   this.joueur.set(joueurMaj);
+                   this.toastr.success(`Nouveau record : ${score} jongles !`, 'Bravo');
+                },
+                error: () => this.toastr.error('Erreur lors de l\'ajout du score', 'Erreur')
+            });
+        }
+    }
   }
-}

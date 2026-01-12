@@ -4,6 +4,7 @@ import { EvenementService } from '../../services/evenement.service';
 import { JoueurService } from '../../services/joueur.service';
 import { EvenementCalendrier, TypeEvenement } from '../../models/evenement.model';
 import { groupesJoueur } from '../../models/joueur.model';
+import { ToastrService } from 'ngx-toastr';
 
 interface JourCalendrier {
   date: Date;
@@ -24,6 +25,7 @@ type EtatNouvelEvenement = Omit<EvenementCalendrier, 'id'>;
 export class CalendrierComponent implements OnInit{
   private evenementService = inject(EvenementService);
   private joueurService = inject(JoueurService);
+  private toastr = inject(ToastrService);
   
   tousLesEvenements = this.evenementService.evenements;
   tousLesJoueurs = this.joueurService.joueurs;
@@ -183,27 +185,47 @@ export class CalendrierComponent implements OnInit{
   }
 
   enregistrerEvenement() {
-    const donneesEvenement = this.nouvelEvenement();
-    if (donneesEvenement.titre.trim() && donneesEvenement.date && donneesEvenement.lieu.trim()) {
-      const evenementAEnregistrer: Omit<EvenementCalendrier, 'id'> = {
-          titre: donneesEvenement.titre.trim(),
-          date: donneesEvenement.date,
-          type: donneesEvenement.type,
-          lieu: donneesEvenement.lieu.trim(),
-          participants: donneesEvenement.participants,
-          equipesAdverses: donneesEvenement.equipesAdverses?.trim() || undefined,
-          groupe: donneesEvenement.groupe
-      };
-      
-      const id = this.idEvenementEnEdition();
-      if (id) {
-        this.evenementService.mettreAJourEvenement({ ...evenementAEnregistrer, id });
-      } else {
-        this.evenementService.ajouterEvenement(evenementAEnregistrer);
+      const donnees = this.nouvelEvenement();
+
+      // Petite validation basique
+      if (!donnees.titre.trim() || !donnees.date || !donnees.lieu.trim()) {
+         this.toastr.warning('Veuillez remplir les champs obligatoires (Titre, Date, Lieu)', 'Oups !');
+         return;
       }
-      this.fermerModale();
-    }
+
+      const evenementAEnregistrer: any = {
+            titre: donnees.titre.trim(),
+            date: donnees.date,
+            type: donnees.type,
+            lieu: donnees.lieu.trim(),
+            participants: donnees.participants,
+            equipesAdverses: donnees.equipesAdverses?.trim() || undefined,
+            groupe: donnees.groupe
+      };
+
+      const id = this.idEvenementEnEdition();
+
+      if (id) {
+          // --- CAS MODIFICATION ---
+          this.evenementService.mettreAJourEvenement({ ...evenementAEnregistrer, id }).subscribe({
+              next: () => {
+                  this.toastr.success('L\'événement a été modifié', 'Succès');
+                  this.fermerModale();
+              },
+              error: () => this.toastr.error('Erreur lors de la modification', 'Erreur')
+          });
+      } else {
+          // --- CAS CRÉATION ---
+          this.evenementService.ajouterEvenement(evenementAEnregistrer).subscribe({
+              next: () => {
+                  this.toastr.success('Nouvel événement ajouté au calendrier', 'C\'est noté !');
+                  this.fermerModale();
+              },
+              error: () => this.toastr.error('Erreur lors de la création', 'Erreur')
+          });
+      }
   }
+
 
   private formaterDatePourApi(date: Date): string {
     const annee = date.getFullYear();
@@ -224,10 +246,15 @@ export class CalendrierComponent implements OnInit{
     };
   }
     supprimerEvenement() {
-        const id = this.idEvenementEnEdition();
-        if (id && confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) {
-            this.evenementService.supprimerEvenement(id);
-            this.fermerModale();
-        }
-    }
+          const id = this.idEvenementEnEdition();
+          if (id && confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) {
+              this.evenementService.supprimerEvenement(id).subscribe({
+                  next: () => {
+                      this.toastr.info('L\'événement a été supprimé', 'Suppression');
+                      this.fermerModale();
+                  },
+                  error: () => this.toastr.error('Impossible de supprimer', 'Erreur')
+              });
+          }
+      }
 }
