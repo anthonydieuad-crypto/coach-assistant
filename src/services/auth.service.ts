@@ -2,8 +2,9 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../environments/environment';
+import { tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
-// Le type d'utilisateur connecté
 export interface UtilisateurConnecte {
   id: number;
   email: string;
@@ -16,31 +17,76 @@ export interface UtilisateurConnecte {
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private apiUrl = `${environment.apiUrl}/auth`; // J'ai raccourci ici pour pouvoir utiliser /login et /register
 
-  // Signal pour savoir si on est connecté (accessible partout)
+  // URL de l'API Auth
+  private apiUrl = `${environment.apiUrl}/auth`;
+
+  // Signal de l'utilisateur connecté
   utilisateurConnecte = signal<UtilisateurConnecte | null>(this.recupererDepuisStorage());
 
-  login(email: string, mdp: string) {
-    return this.http.post<UtilisateurConnecte>(`${this.apiUrl}/login`, { email, password: mdp });
+  constructor() {}
+
+  // ✅ LOGIN : On garde le tap pour la sécurité (stockage auto)
+  login(email: string, password: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login`, { email, password }).pipe(
+      tap(response => {
+        if (response.token) {
+          // On sauvegarde déjà ici pour être sûr
+          this.sauvegarderSession(response);
+        }
+      })
+    );
   }
 
-  // 👇 NOUVELLE MÉTHODE
-  inscription(nom: string, prenom: string, email: string, mdp: string) {
-    return this.http.post<UtilisateurConnecte>(`${this.apiUrl}/register`, { nom, prenom, email, password: mdp });
+  // ✅ REGISTER
+  inscription(nom: string, prenom: string, email: string, mdp: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/register`, {
+      nom,
+      prenom,
+      email,
+      password: mdp
+    });
   }
 
-  // Stocker la session quand la connexion réussit
-  gererConnexionReussie(user: UtilisateurConnecte) {
-    this.utilisateurConnecte.set(user);
-    localStorage.setItem('user_session', JSON.stringify(user));
-    this.router.navigate(['/calendrier']); // Redirection vers l'accueil
-  }
-
+  // ✅ LOGOUT
   logout() {
     this.utilisateurConnecte.set(null);
+    localStorage.removeItem('token');
     localStorage.removeItem('user_session');
     this.router.navigate(['/login']);
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  // 👇 LA MÉTHODE MANQUANTE QUE TES COMPOSANTS APPELLENT
+  // Elle sert à finaliser la connexion (stockage + redirection)
+  // Utile pour le composant Signup ou Login
+  gererConnexionReussie(response: any) {
+    this.sauvegarderSession(response); // Stocke le token et l'user
+    this.router.navigate(['/calendrier']); // Redirige vers l'accueil
+  }
+
+  // --- PRIVÉ ---
+
+  private sauvegarderSession(response: any) {
+    // 1. Token
+    if (response.token) {
+        localStorage.setItem('token', response.token);
+    }
+
+    // 2. Infos User
+    const user: UtilisateurConnecte = {
+      id: response.id,
+      email: response.email,
+      role: response.role,
+      nom: response.nom,
+      prenom: response.prenom
+    };
+
+    localStorage.setItem('user_session', JSON.stringify(user));
+    this.utilisateurConnecte.set(user);
   }
 
   private recupererDepuisStorage(): UtilisateurConnecte | null {
