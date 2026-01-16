@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { NgClass, NgOptimizedImage } from '@angular/common';
 import { JoueurService } from '../../services/joueur.service';
 import { EvenementService } from '../../services/evenement.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-suivi-presences',
@@ -16,6 +17,7 @@ export class SuiviPresencesComponent {
   private joueurService = inject(JoueurService);
   private evenementService = inject(EvenementService);
   private router = inject(Router);
+  private toastr = inject(ToastrService);
 
   joueurs = this.joueurService.joueurs;
 
@@ -83,10 +85,15 @@ const today = new Date();
 
     this.joueurService.enregistrerPresences(idsJoueursPresents, date);
 
-    const entrainementMisAJour = { ...entrainement, participants: idsJoueursPresents };
-    this.evenementService.mettreAJourEvenement(entrainementMisAJour);
 
-    alert('Présences enregistrées !');
+    const entrainementMisAJour = { ...entrainement, participants: idsJoueursPresents };
+    this.evenementService.mettreAJourEvenement(entrainementMisAJour).subscribe({
+        next:() =>{
+            this.toastr.success('Présences validées et calendrier mis à jour !', 'Succès');            },
+        error: (err) => {
+            console.error(err);
+            this.toastr.error('Erreur lors de la mise à jour du calendrier', 'Oups !');            }
+        });
   }
 
   private formaterDate(dateStr: string): string {
