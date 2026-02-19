@@ -34,9 +34,12 @@ export class EvenementService {
     if (!user) return;
 
     this.http.get<EvenementCalendrier[]>(`${this.apiUrl}?coachId=${user.id}`).subscribe({
-      next: (data) => this.etatEvenements.set(data),
-      error: (err) => console.error('Erreur chargement', err)
-    });
+       next: (data) => {
+       const dataTrie = data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+       this.etatEvenements.set(dataTrie);
+       },
+       error: (err) => console.error('Erreur chargement', err)
+       });
   }
 
   // 👇 MODIFIÉ : On retourne l'Observable + pipe(tap)

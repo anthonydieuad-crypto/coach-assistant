@@ -9,6 +9,7 @@ import { ListeJoueursComponent } from "@/src/components/liste-joueurs/liste-joue
 import { DetailJoueurComponent } from "@/src/components/detail-joueur/detail-joueur.component";
 import { BilanPresencesComponent } from "@/src/components/bilan-presences/bilan-presences.component";
 import { BilanCompetitionsComponent } from "@/src/components/bilan-competitions/bilan-competitions.component";
+import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -19,6 +20,7 @@ export const routes: Routes = [
         canActivate: [authGuard],
         children: [
             { path: '', redirectTo: 'calendrier', pathMatch: 'full' },
+            { path: 'admin', component: AdminDashboardComponent },
             { path: 'calendrier', component: CalendrierComponent },
             { path: 'presences', component: SuiviPresencesComponent },
             { path: 'joueurs', component: ListeJoueursComponent },
