@@ -10,6 +10,7 @@ import { DetailJoueurComponent } from "@/src/components/detail-joueur/detail-jou
 import { BilanPresencesComponent } from "@/src/components/bilan-presences/bilan-presences.component";
 import { BilanCompetitionsComponent } from "@/src/components/bilan-competitions/bilan-competitions.component";
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard';
+import { GenerateurConvocationComponent } from './components/generateur-convocation/generateur-convocation';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -27,8 +28,8 @@ export const routes: Routes = [
             { path: 'joueurs/:id', component: DetailJoueurComponent },
             { path: 'bilan-presences', component: BilanPresencesComponent },
             { path: 'bilan-competitions', component: BilanCompetitionsComponent },
-            { path: 'profil', component: ProfilComponent }, // 👈 Nouvelle route ici
-        ]
+            { path: 'profil', component: ProfilComponent },
+            { path: 'convocations', component: GenerateurConvocationComponent, canActivate: [authGuard] },]
     },
 
     { path: '**', redirectTo: 'login' }
