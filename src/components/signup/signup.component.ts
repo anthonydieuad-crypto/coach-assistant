@@ -24,18 +24,23 @@ export class SignupComponent {
     isLoading = signal(false);
 
     sInscrire() {
+        // 1. Vérification des champs vides
         if (!this.nom() || !this.prenom() || !this.email() || !this.password()) {
             this.erreur.set("Tous les champs sont obligatoires.");
             return;
         }
 
-        // 👇 2. On lance le chargement
+        // 2. Sécurité : Vérification de la taille du mot de passe
+        if (this.password().length < 6) {
+            this.erreur.set("Le mot de passe doit contenir au moins 6 caractères.");
+            return;
+        }
+
         this.isLoading.set(true);
         this.erreur.set('');
 
         this.authService.inscription(this.nom(), this.prenom(), this.email(), this.password())
             .pipe(
-                // 👇 3. On arrête le chargement à la fin
                 finalize(() => this.isLoading.set(false))
             )
             .subscribe({
@@ -43,8 +48,20 @@ export class SignupComponent {
                     this.authService.gererConnexionReussie(user);
                 },
                 error: (err) => {
-                    console.error(err);
-                    this.erreur.set("Erreur lors de l'inscription. Cet email est peut-être déjà utilisé.");
+                    console.error("Erreur Backend :", err);
+                    
+                    // 3. Gestion ciblée des erreurs du serveur
+                    if (err.status === 409) {
+                        this.erreur.set("Cet email est déjà utilisé. Veuillez cliquer sur 'Se connecter'.");
+                    } else if (err.status === 400) {
+                        this.erreur.set("Les informations saisies sont invalides.");
+                    } else if (err.error && typeof err.error === 'string') {
+                        // Si le backend renvoie un message texte précis
+                        this.erreur.set(err.error);
+                    } else {
+                        // Problème réseau ou serveur crashé
+                        this.erreur.set("Impossible de joindre le serveur. Vérifiez votre connexion.");
+                    }
                 }
             });
     }
