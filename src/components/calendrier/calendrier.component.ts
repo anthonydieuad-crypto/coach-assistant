@@ -5,6 +5,7 @@ import { JoueurService } from '../../services/joueur.service';
 import { EvenementCalendrier, TypeEvenement } from '../../models/evenement.model';
 import { groupesJoueur } from '../../models/joueur.model';
 import { ToastrService } from 'ngx-toastr';
+import { Changelog } from '../changelog/changelog';
 
 interface JourCalendrier {
   date: Date;
@@ -17,7 +18,7 @@ type EtatNouvelEvenement = Omit<EvenementCalendrier, 'id'>;
 @Component({
   selector: 'app-calendrier',
   standalone: true,
-  imports: [],
+  imports: [Changelog],
   templateUrl: './calendrier.component.html',
   styleUrls: ['./calendrier.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
