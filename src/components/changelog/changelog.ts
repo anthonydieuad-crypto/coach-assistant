@@ -11,7 +11,7 @@ export class Changelog implements OnInit{
   //Signal pour contrôler l'affichage de la modal
   isVisible = signal(false);
   
-  private readonly CURRENT_VERSION = 'v1.2';
+  private readonly CURRENT_VERSION = 'v1.3';
 
   ngOnInit(): void {
     //On vérifie dans la mémoire du navigateur quelle version l'utilisateur a vu en dernier
