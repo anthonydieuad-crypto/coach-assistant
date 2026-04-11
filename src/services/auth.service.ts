@@ -68,6 +68,16 @@ export class AuthService {
     this.router.navigate(['/calendrier']); // Redirige vers l'accueil
   }
 
+  //Envoie du mail pour le mot de passe oublié
+  demanderReinitialisation(email: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/forgot-password`, {email});
+  }
+
+  //Validation du nouveau mot de passe
+  reinitialisationMotDePasse(token:string, password:string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/reset-password`, {token, password});
+  }
+
   // --- PRIVÉ ---
 
   private sauvegarderSession(response: any) {

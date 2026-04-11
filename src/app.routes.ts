@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from '@/src/components/login/login';
 import { SignupComponent } from '@/src/components/signup/signup.component';
-import { ProfilComponent } from '@/src/components/profil/profil.component'; // 👈 Import
+import { ProfilComponent } from '@/src/components/profil/profil.component';
 import { authGuard } from './guards/auth.guard';
 import { CalendrierComponent } from "@/src/components/calendrier/calendrier.component";
 import { SuiviPresencesComponent } from "@/src/components/suivi-presences/suivi-presences.component";
@@ -11,10 +11,14 @@ import { BilanPresencesComponent } from "@/src/components/bilan-presences/bilan-
 import { BilanCompetitionsComponent } from "@/src/components/bilan-competitions/bilan-competitions.component";
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard';
 import { GenerateurConvocationComponent } from './components/generateur-convocation/generateur-convocation';
+import { ForgotPassword } from './components/forgot-password/forgot-password';
+import { ResetPassword } from './components/reset-password/reset-password';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'signup', component: SignupComponent },
+    { path: 'forgot-password', component: ForgotPassword },
+    { path: 'reset-password', component: ResetPassword },
 
     {
         path: '',
