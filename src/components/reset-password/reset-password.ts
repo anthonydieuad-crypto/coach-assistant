@@ -1,12 +1,13 @@
 import { AuthService } from '@/src/services/auth.service';
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-reset-password',
-  imports: [],
+  imports: [FormsModule, RouterLink],
   templateUrl: './reset-password.html',
   styleUrl: './reset-password.css',
 })
@@ -30,7 +31,7 @@ ngOnInit(): void {
     });
   }
 
-  changerMotdePasse() {
+  changerMotDePasse() {
     if (!this.token()) return;
     
     if (this.password() !== this.confirmPassword()) {
