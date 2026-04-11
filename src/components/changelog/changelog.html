@@ -1,42 +1,50 @@
-<div class="p-6">
-    <div class="flex items-center justify-between mb-5">
-        <h3 class="text-2xl font-bold text-white flex items-center">
-            <span class="mr-2">🚀</span> Quoi de neuf ?
-        </h3>
-        <span class="bg-amber-500/20 text-amber-400 text-xs font-bold px-2.5 py-1 rounded-full border border-amber-500/30">
-            Version 1.3
-        </span>
-    </div>
+@if (isVisible()) {
+    <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        
+        <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl max-w-md w-full overflow-hidden animate-fade-in-down">
+            
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-5">
+                    <h3 class="text-2xl font-bold text-white flex items-center">
+                        <span class="mr-2">🚀</span> Quoi de neuf ?
+                    </h3>
+                    <span class="bg-amber-500/20 text-amber-400 text-xs font-bold px-2.5 py-1 rounded-full border border-amber-500/30">
+                        Version 1.3
+                    </span>
+                </div>
 
-    <div class="space-y-4 text-gray-300">
-        <div class="flex gap-3">
-            <div class="flex-shrink-0 mt-1 text-amber-500">🔐</div>
-            <div>
-                <strong class="text-white block">Récupération de mot de passe</strong>
-                <span class="text-sm">Un trou de mémoire ? Vous pouvez désormais réinitialiser votre mot de passe en toute sécurité directement depuis la page de connexion via un lien envoyé sur votre e-mail.</span>
-            </div>
-        </div>
+                <div class="space-y-4 text-gray-300">
+                    <div class="flex gap-3">
+                        <div class="flex-shrink-0 mt-1 text-amber-500">🔐</div>
+                        <div>
+                            <strong class="text-white block">Récupération de mot de passe</strong>
+                            <span class="text-sm">Un trou de mémoire ? Vous pouvez désormais réinitialiser votre mot de passe en toute sécurité directement depuis la page de connexion via un lien envoyé sur votre e-mail.</span>
+                        </div>
+                    </div>
 
-        <div class="flex gap-3">
-            <div class="flex-shrink-0 mt-1 text-amber-500">🎨</div>
-            <div>
-                <strong class="text-white block">Navigation Harmonisée</strong>
-                <span class="text-sm">La barre de navigation a fait peau neuve ! Un design plus clair, cohérent et optimisé pour que vous trouviez vos onglets plus facilement sur PC et mobile.</span>
-            </div>
-        </div>
+                    <div class="flex gap-3">
+                        <div class="flex-shrink-0 mt-1 text-amber-500">🎨</div>
+                        <div>
+                            <strong class="text-white block">Navigation Harmonisée</strong>
+                            <span class="text-sm">La barre de navigation a fait peau neuve ! Un design plus clair, cohérent et optimisé pour que vous trouviez vos onglets plus facilement sur PC et mobile.</span>
+                        </div>
+                    </div>
 
-        <div class="flex gap-3">
-            <div class="flex-shrink-0 mt-1 text-amber-500">🛡️</div>
-            <div>
-                <strong class="text-white block">Stabilité et Sécurité</strong>
-                <span class="text-sm">Nous avons renforcé la sécurité en arrière-plan (chiffrement des données de connexion) et corrigé quelques bugs mineurs pour rendre l'application plus rapide.</span>
+                    <div class="flex gap-3">
+                        <div class="flex-shrink-0 mt-1 text-amber-500">🛡️</div>
+                        <div>
+                            <strong class="text-white block">Stabilité et Sécurité</strong>
+                            <span class="text-sm">Nous avons renforcé la sécurité en arrière-plan (chiffrement des données de connexion) et corrigé quelques bugs mineurs pour rendre l'application plus rapide.</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8">
+                    <button (click)="fermer()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 px-4 rounded-lg transition-colors shadow-lg">
+                        Génial, merci !
+                    </button>
+                </div>
             </div>
-        </div>
+            </div>
     </div>
-    
-    <div class="mt-8">
-        <button (click)="fermer()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 px-4 rounded-lg transition-colors shadow-lg">
-            Génial, merci !
-        </button>
-    </div>
-</div>
+}
