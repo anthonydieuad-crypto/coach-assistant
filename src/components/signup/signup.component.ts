@@ -3,6 +3,7 @@ import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-signup',
@@ -13,6 +14,7 @@ import { finalize } from 'rxjs/operators';
 export class SignupComponent {
     private authService = inject(AuthService);
     private router = inject(Router);
+    private toastr = inject(ToastrService);
 
     nom = signal('');
     prenom = signal('');
@@ -44,8 +46,8 @@ export class SignupComponent {
                 finalize(() => this.isLoading.set(false))
             )
             .subscribe({
-                next: (user) => {
-                    this.authService.gererConnexionReussie(user);
+                next: () => {
+                    this.toastr.success('Bienvenue dans l\'équipe, Coach !', 'Inscription réussie');
                 },
                 error: (err) => {
                     console.error("Erreur Backend :", err);

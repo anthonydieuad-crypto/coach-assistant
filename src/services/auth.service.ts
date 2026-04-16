@@ -45,7 +45,14 @@ export class AuthService {
       prenom,
       email,
       password: mdp
-    });
+    }).pipe(
+      tap(response => {
+        if (response.token) {
+          this.sauvegarderSession(response);
+        }
+      })
+      
+    );
   }
 
   // ✅ LOGOUT
@@ -60,13 +67,6 @@ export class AuthService {
     return localStorage.getItem('token');
   }
 
-  // 👇 LA MÉTHODE MANQUANTE QUE TES COMPOSANTS APPELLENT
-  // Elle sert à finaliser la connexion (stockage + redirection)
-  // Utile pour le composant Signup ou Login
-  gererConnexionReussie(response: any) {
-    this.sauvegarderSession(response); // Stocke le token et l'user
-    this.router.navigate(['/calendrier']); // Redirige vers l'accueil
-  }
 
   //Envoie du mail pour le mot de passe oublié
   demanderReinitialisation(email: string): Observable<any> {
