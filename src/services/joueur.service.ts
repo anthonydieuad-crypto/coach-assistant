@@ -10,7 +10,7 @@ import { tap } from 'rxjs/operators';
 })
 export class JoueurService {
     private http = inject(HttpClient);
-    private authService = inject(AuthService); // 👇 On récupère l'info du coach
+    private authService = inject(AuthService);
     private apiUrl = `${environment.apiUrl}/joueurs`;
 
     private etatJoueurs = signal<Joueur[]>([]);
@@ -30,21 +30,18 @@ export class JoueurService {
     }
 
     chargerJoueurs() {
-        const user = this.authService.utilisateurConnecte();
-        if (!user) return;
-
-        // 👇 On ajoute ?coachId=123 à la requête
-        this.http.get<Joueur[]>(`${this.apiUrl}?coachId=${user.id}`).subscribe({
+        if (!this.authService.utilisateurConnecte()) return;
+       
+        this.http.get<Joueur[]>(this.apiUrl).subscribe({
             next: (data) => this.etatJoueurs.set(data),
-            error: (err) => console.error('Erreur chargement joueurs', err)
+            error: (err) => console.error('Erreur chargement joueur', err)
         });
     }
 
    ajouterJoueur(donneesJoueur: Omit<Joueur, 'id' | 'historiqueJongles' | 'presences' | 'photoUrl'>) {
-           const user = this.authService.utilisateurConnecte();
-           if (!user) throw new Error("Non connecté");
+           if (!this.authService.utilisateurConnecte()) throw new Error("Non connecté"); 
 
-           return this.http.post<Joueur>(`${this.apiUrl}?coachId=${user.id}`, donneesJoueur).pipe(
+           return this.http.post<Joueur>(this.apiUrl, donneesJoueur).pipe(
                tap((nouveauJoueur) => {
                    this.etatJoueurs.update(liste => [...liste, nouveauJoueur]);
                })

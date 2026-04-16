@@ -30,10 +30,9 @@ export class EvenementService {
   }
 
   chargerEvenements() {
-    const user = this.authService.utilisateurConnecte();
-    if (!user) return;
-
-    this.http.get<EvenementCalendrier[]>(`${this.apiUrl}?coachId=${user.id}`).subscribe({
+    if (!this.authService.utilisateurConnecte()) return;
+     
+    this.http.get<EvenementCalendrier[]>(this.apiUrl).subscribe({
        next: (data) => {
        const dataTrie = data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
        this.etatEvenements.set(dataTrie);
@@ -42,20 +41,15 @@ export class EvenementService {
        });
   }
 
-  // 👇 MODIFIÉ : On retourne l'Observable + pipe(tap)
   ajouterEvenement(evenement: Omit<EvenementCalendrier, 'id'>) {
-    const user = this.authService.utilisateurConnecte();
-    if (!user) throw new Error("Non connecté");
-
-    return this.http.post<EvenementCalendrier>(`${this.apiUrl}?coachId=${user.id}`, evenement).pipe(
+    if (!this.authService.utilisateurConnecte()) throw new Error("Non connécté");
+    
+    return this.http.post<EvenementCalendrier>(this.apiUrl, evenement).pipe(
       tap((nouvelEvent) => {
-        // Mise à jour immédiate de la liste locale
         this.etatEvenements.update(liste => [...liste, nouvelEvent]);
       })
     );
   }
-
-  // 👇 MODIFIÉ
   mettreAJourEvenement(evenement: EvenementCalendrier) {
     return this.http.put<EvenementCalendrier>(`${this.apiUrl}/${evenement.id}`, evenement).pipe(
       tap((eventMaj) => {
