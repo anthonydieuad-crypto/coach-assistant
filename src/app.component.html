@@ -4,8 +4,10 @@
         <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
 
-                <div class="flex-shrink-0">
-                    <span class="text-amber-500 font-bold text-xl tracking-wider whitespace-nowrap">COACH ASSIST</span>
+                <div class="flex-shrink-0 flex items-center">
+                    <a routerLink="/dashboard" class="text-amber-500 font-bold text-xl tracking-wider whitespace-nowrap cursor-pointer hover:text-amber-400 transition-colors">
+                        COACH ASSIST
+                     </a>
                 </div>
 
                 <div class="hidden md:flex flex-1 items-center justify-end">
@@ -96,15 +98,12 @@
     </nav>
     }
 
-    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+   <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         @if (loaderService.isLoading()) {
-        <div class="loader-overlay">
-            <div class="loader-content">
-                <div class="spinner"></div>
-                <div class="loading-text">Chargement...</div>
-            </div>
-        </div>
-        }
+            }
         <router-outlet></router-outlet>
     </main>
+
+    <app-changelog/> 
+
 </div>

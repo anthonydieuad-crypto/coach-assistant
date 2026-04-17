@@ -13,6 +13,7 @@ import { AdminDashboardComponent } from './components/admin-dashboard/admin-dash
 import { GenerateurConvocationComponent } from './components/generateur-convocation/generateur-convocation';
 import { ForgotPassword } from './components/forgot-password/forgot-password';
 import { ResetPassword } from './components/reset-password/reset-password';
+import { Dashboard } from './components/dashboard/dashboard';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -24,7 +25,8 @@ export const routes: Routes = [
         path: '',
         canActivate: [authGuard],
         children: [
-            { path: '', redirectTo: 'calendrier', pathMatch: 'full' },
+            { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+            { path: 'dashboard', component: Dashboard},
             { path: 'admin', component: AdminDashboardComponent },
             { path: 'calendrier', component: CalendrierComponent },
             { path: 'presences', component: SuiviPresencesComponent },

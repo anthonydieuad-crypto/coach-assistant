@@ -36,7 +36,7 @@ export class LoginComponent {
                     // On affiche le toast
                     this.toastr.success('Heureux de vous revoir, Coach !', 'Connexion réussie');
                     // PUIS on gère la suite
-                    this.router.navigate(['/calendrier']);
+                    this.router.navigate(['/dashboard']);
                 },
                 error: (err) => {
                     // On affiche le toast d'erreur
