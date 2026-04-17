@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule], // 👈 Ajouté ici
+  imports: [CommonModule],
   templateUrl: './admin-dashboard.html'
   // 👈 J'ai supprimé la ligne styleUrl car tu n'as pas de fichier CSS
 })
@@ -46,5 +46,25 @@ export class AdminDashboardComponent implements OnInit { // 👈 Ajout du mot "C
         error: () => this.toastr.error('Erreur lors de la suppression', 'Oups')
       });
     }
+  }
+
+  changerRole(userId: number, event: Event) {
+    const select = event.target as HTMLSelectElement;
+    const nouveauRole = select.value;
+
+    this.adminService.updateUserRole(userId, nouveauRole).subscribe({
+      next: () => {
+        this.toastr.success('Le rôle a été mis à jour avec succès');
+        
+        // Mise à jour visuelle immédiate dans le signal users()
+        this.users.update(utilisateurs => 
+          utilisateurs.map(u => u.id === userId ? { ...u, role: nouveauRole } : u)
+        );
+      },
+      error: () => {
+        this.toastr.error('Erreur lors du changement de rôle');
+        this.chargerUtilisateurs(); 
+      }
+    });
   }
 }

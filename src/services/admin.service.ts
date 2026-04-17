@@ -25,5 +25,9 @@ export class AdminService {
      deleteUser(id: number): Observable<void> {
          return this.http.delete<void>(`${this.apiUrl}/users/${id}`);
          }
+
+         updateUserRole(userId: number, role: string): Observable<void> {
+            return this.http.put<void>(`${this.apiUrl}/users/${userId}/role`, { role });
+}
   
 }
