@@ -1,9 +1,9 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, effect, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../environments/environment';
-import { tap } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { tap, throttleTime } from 'rxjs/operators';
+import { fromEvent, merge, Observable } from 'rxjs';
 
 export interface UtilisateurConnecte {
   id: number;
@@ -24,7 +24,53 @@ export class AuthService {
   // Signal de l'utilisateur connecté
   utilisateurConnecte = signal<UtilisateurConnecte | null>(this.recupererDepuisStorage());
 
-  constructor() {}
+  //Convertion 2 heures en millisecondes
+  private readonly INACTIVITY_TIMEOUT = 2 * 60 * 1000;
+  private timer: any;
+
+  constructor() {
+    if (this.utilisateurConnecte()) {
+      this.initInactivityTimer();
+    }
+    //On réagit automatiquement quand l'état de connection change
+    effect(() => {
+      if (this.utilisateurConnecte()){ 
+      this.initInactivityTimer();  
+      }else{
+        this.stopInactivityTimer();
+      }
+    });
+  }
+
+  //initialisations des écouteurs d'événements
+  private initInactivityTimer() {
+    this.stopInactivityTimer()//on nettoie l'ancien timer si il existe
+
+    const activity$ = merge(
+      fromEvent(window, 'mousemove'),
+      fromEvent(window, 'mousedown'),
+      fromEvent(window, 'keydown'),
+      fromEvent(window, 'scroll'),
+      fromEvent(window, 'touchstart')
+    ).pipe(throttleTime(5000));
+
+    activity$.subscribe(() => this.resetTimer());
+    this.resetTimer();
+
+  }
+  private resetTimer() {
+    if(this.timer) clearTimeout(this.timer);
+
+    this.timer = setTimeout(() => {
+      console.warn('Déconnexion automatique pour inactivité.');
+      this.logout();
+    },this.INACTIVITY_TIMEOUT);
+  }
+
+  private stopInactivityTimer() {
+    if (this.timer) clearTimeout(this.timer) 
+  }
+
 
   // ✅ LOGIN : On garde le tap pour la sécurité (stockage auto)
   login(email: string, password: string): Observable<any> {
@@ -57,6 +103,7 @@ export class AuthService {
 
   // ✅ LOGOUT
   logout() {
+    this.stopInactivityTimer();
     this.utilisateurConnecte.set(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user_session');
