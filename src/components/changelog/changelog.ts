@@ -1,14 +1,14 @@
 import { Component, inject, effect, signal } from '@angular/core';
-import { AuthService } from '../../services/auth.service'; // 👈 Vérifie le chemin
+import { AuthService } from '../../services/auth.service'; 
 
 @Component({
   selector: 'app-changelog',
-  standalone: true, // Assure-toi qu'il est standalone
+  standalone: true,
   templateUrl: './changelog.html',
   styleUrl: './changelog.css',
 })
 export class Changelog {
-  private authService = inject(AuthService); // 👈 On injecte l'auth
+  private authService = inject(AuthService);
   
   isVisible = signal(false);
   private readonly CURRENT_VERSION = 'v1.5';

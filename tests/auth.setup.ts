@@ -4,7 +4,7 @@ const authFile = 'playwright/.auth/user.json';
 
 setup('Authentification globale', async ({page}) => {
     await page.addInitScript(() => {
-        window.localStorage.setItem('changelog_version', 'v1.4');
+        window.localStorage.setItem('changelog_version', 'v1.5');
     });
     //Navigation vers la page de login
     await page.goto('/login');
