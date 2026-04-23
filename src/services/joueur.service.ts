@@ -4,6 +4,7 @@ import { environment } from "./../environments/environment";
 import { HttpClient } from "@angular/common/http";
 import { AuthService } from "./auth.service";
 import { tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -90,4 +91,10 @@ export class JoueurService {
             );
         });
     }
+
+    importerJoueursCSV(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post(`${this.apiUrl}/import-csv`, formData);
+  }
 }

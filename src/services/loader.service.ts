@@ -1,17 +1,22 @@
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoaderService {
-  // Un signal qui vaut true ou false. Simple.
-  isLoading = signal(false);
+  // 1. On garde une trace du nombre exact de requêtes en cours
+  private requetesEnCours = signal(0);
+
+  // 2. Le spinner est visible si le compteur est strictement supérieur à 0
+  isLoading = computed(() => this.requetesEnCours() > 0);
 
   show() {
-    this.isLoading.set(true);
+    // On incrémente le compteur à chaque nouvelle requête
+    this.requetesEnCours.update(count => count + 1);
   }
 
   hide() {
-    this.isLoading.set(false);
+    // On décrémente quand une requête se termine (avec Math.max pour ne jamais descendre sous 0)
+    this.requetesEnCours.update(count => Math.max(0, count - 1));
   }
 }

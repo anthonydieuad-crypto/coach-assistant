@@ -3,7 +3,7 @@ import {test, expect} from '@playwright/test'
 test.describe('Page de Connexion', () => {
     test.beforeEach(async({page}) => {
         await page.addInitScript(() => {
-        window.localStorage.setItem('changelog_version', 'v1.4')
+        window.localStorage.setItem('changelog_version', 'v1.5')
         });
         await page.goto('/login');
     });

@@ -5,6 +5,7 @@ import { EvenementService } from '../../services/evenement.service';
 import { GroupeJoueur, Joueur } from '../../models/joueur.model';
 import {Router} from "@angular/router";
 import { ToastrService } from 'ngx-toastr';
+import { finalize } from 'rxjs';
 
 type FiltreGroupeJoueur = 'all' | 'Equipe 1' | 'Equipe 2' | 'Equipe 3' | 'none';
 
@@ -24,6 +25,8 @@ export class ListeJoueursComponent {
   // 2. On récupère les données directement depuis les services
   joueurs = this.joueurService.joueurs;
   tousLesEvenements = this.evenementService.evenements;
+
+  isImporting = signal(false);
 
   // 3. Logique de filtrage (inchangée)
   filtreActif = signal<FiltreGroupeJoueur>('all');
@@ -59,6 +62,37 @@ export class ListeJoueursComponent {
 
   definirFiltre(filtre: FiltreGroupeJoueur) {
     this.filtreActif.set(filtre);
+  }
+
+  // --- GESTION DE L'IMPORT CSV ---
+ onFileSelected(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file: File | undefined = target.files?.[0];
+    
+    if (file) {
+      // 1. On active le spinner sur le bouton
+      this.isImporting.set(true); 
+
+      this.joueurService.importerJoueursCSV(file)
+        .pipe(
+          // 2. finalize s'exécute TOUJOURS à la fin de la requête (succès ou échec)
+          finalize(() => {
+            this.isImporting.set(false); // On désactive le spinner
+            target.value = ''; // On vide l'input file
+          })
+        )
+        .subscribe({
+          next: (response: any) => {
+            this.toastr.success(response.message || 'Joueurs importés avec succès !', 'Succès');
+            // On recharge la liste via le service
+            this.joueurService.chargerJoueurs();
+          },
+          error: (err) => {
+            this.toastr.error('Erreur lors de l\'importation du fichier.', 'Erreur');
+            console.error("Erreur import CSV:", err);
+          }
+        });
+    }
   }
 
   // Ouverture modale
