@@ -21,8 +21,6 @@ export class SignupComponent {
     email = signal('');
     password = signal('');
     erreur = signal('');
-    succes = signal('');
-
     isLoading = signal(false);
 
     sInscrire() {
@@ -48,6 +46,7 @@ export class SignupComponent {
             .subscribe({
                 next: () => {
                     this.toastr.success('Bienvenue dans l\'équipe, Coach !', 'Inscription réussie');
+                    this.router.navigate(['/dashboard']);
                 },
                 error: (err) => {
                     console.error("Erreur Backend :", err);
