@@ -21,8 +21,23 @@
                         <a routerLink="/joueurs" routerLinkActive="bg-slate-900 text-white"
                            class="text-gray-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer whitespace-nowrap border-b-2 border-transparent hover:border-orange-500">Effectif</a>
                         
-                        <a routerLink="/convocations" routerLinkActive="bg-slate-900 text-white" 
-                           class="text-gray-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer whitespace-nowrap border-b-2 border-transparent hover:border-orange-500">Convocations</a>
+                        <div class="relative inline-flex items-center group h-full">
+                            <button type="button" class="text-gray-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer whitespace-nowrap border-b-2 border-transparent hover:border-orange-500 inline-flex items-center">
+                                📄 Générer...
+                                <svg class="-mr-1 ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                            </button>
+                            
+                            <div class="origin-top-right absolute right-0 top-full mt-1 w-56 rounded-md shadow-lg bg-slate-800 ring-1 ring-black ring-opacity-5 hidden group-hover:block z-[100] border border-slate-700">
+                                <div class="py-1">
+                                    <a routerLink="/convocations" routerLinkActive="bg-slate-700 text-white" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-slate-700 hover:text-white transition-colors">
+                                        <span class="mr-3 text-lg">📢</span> Convocations
+                                    </a>
+                                    <a routerLink="/feuille-match" routerLinkActive="bg-slate-700 text-white" class="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-slate-700 hover:text-white transition-colors">
+                                        <span class="mr-3 text-lg">⚽</span> Feuille de Match (PDF)
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                         
                         <a routerLink="/bilan-presences" routerLinkActive="bg-slate-900 text-white"
                            class="text-gray-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer whitespace-nowrap border-b-2 border-transparent hover:border-orange-500">Bilan Présences</a>
@@ -75,8 +90,14 @@
                 <a routerLink="/joueurs" (click)="closeMobileMenu()" routerLinkActive="bg-slate-900 text-white"
                    class="text-gray-300 hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Effectif</a>
                 
-                <a routerLink="/convocations" (click)="closeMobileMenu()" routerLinkActive="bg-slate-900 text-white" 
-                   class="text-gray-300 hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Convocations</a>
+                <div class="border-y border-slate-700 my-2 py-2 bg-slate-800/50">
+                    <p class="px-3 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 mt-1">📄 Générer</p>
+                    <a routerLink="/convocations" (click)="closeMobileMenu()" routerLinkActive="bg-slate-900 text-white border-l-4 border-amber-500" 
+                       class="text-gray-300 hover:bg-slate-700 hover:text-white block px-3 py-2 text-base font-medium transition-all">📢 Convocations</a>
+                    
+                    <a routerLink="/feuille-match" (click)="closeMobileMenu()" routerLinkActive="bg-slate-900 text-white border-l-4 border-amber-500"
+                       class="text-gray-300 hover:bg-slate-700 hover:text-white block px-3 py-2 text-base font-medium transition-all">⚽ Feuille de Match (PDF)</a>
+                </div>
                 
                 <a routerLink="/bilan-presences" (click)="closeMobileMenu()" routerLinkActive="bg-slate-900 text-white"
                    class="text-gray-300 hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Bilan Présences</a>

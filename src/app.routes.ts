@@ -14,6 +14,7 @@ import { GenerateurConvocationComponent } from './components/generateur-convocat
 import { ForgotPassword } from './components/forgot-password/forgot-password';
 import { ResetPassword } from './components/reset-password/reset-password';
 import { Dashboard } from './components/dashboard/dashboard';
+import { FeuilleMatchComponent } from './components/feuille-match/feuille-match-component/feuille-match-component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -35,6 +36,7 @@ export const routes: Routes = [
             { path: 'bilan-presences', component: BilanPresencesComponent },
             { path: 'bilan-competitions', component: BilanCompetitionsComponent },
             { path: 'profil', component: ProfilComponent },
+            { path: 'feuille-match', component: FeuilleMatchComponent, canActivate: [authGuard] },
             { path: 'convocations', component: GenerateurConvocationComponent, canActivate: [authGuard] },]
     },
 

@@ -27,6 +27,28 @@ export class ListeJoueursComponent {
   tousLesEvenements = this.evenementService.evenements;
 
   isImporting = signal(false);
+  estModaleFeuilleMatchOuverte = signal(false);
+  selectionFeuilleMatch = signal<number[]>([]);
+
+  //méthode pour séléctionner un joueurs
+  basculerSelectionJoueur(id:number) {
+    this.selectionFeuilleMatch.update(selection => {
+      if (selection.includes(id)) {
+        return selection.filter(jId => jId !== id); //rétiré le joeurs si déja coché
+      }else {
+        if (selection.length >= 10) return selection; 
+          return [...selection, id]
+      }
+    })
+  }
+
+  validerGenerationFeuille() {
+    if (this.selectionFeuilleMatch().length > 0) {
+      this.joueurService.telechargerFeuilleDeMatchPdf(this.selectionFeuilleMatch());
+      this.estModaleAjoutJoueurOuverte.set(false);
+      this.selectionFeuilleMatch.set([])
+    }
+  }
 
   // 3. Logique de filtrage (inchangée)
   filtreActif = signal<FiltreGroupeJoueur>('all');

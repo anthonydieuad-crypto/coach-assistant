@@ -5,6 +5,7 @@ import { HttpClient } from "@angular/common/http";
 import { AuthService } from "./auth.service";
 import { tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { blob } from 'stream/consumers';
 
 @Injectable({
     providedIn: 'root',
@@ -97,4 +98,20 @@ export class JoueurService {
     formData.append('file', file);
     return this.http.post(`${this.apiUrl}/import-csv`, formData);
   }
+
+  telechargerFeuilleDeMatchPdf(joueurIds: number[]) {
+    this.http.post(`${this.apiUrl}/feuille-match/pdf`, joueurIds, {responseType: 'blob'}).subscribe({
+        next: (blob) => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'feuille_de_match.pdf';
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
+        },
+        error: (err) => console.error('Erreur de téléchargement PDF', err)
+    });
+}
+  
 }
