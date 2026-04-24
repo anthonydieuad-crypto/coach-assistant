@@ -48,6 +48,7 @@ export class ListeJoueursComponent {
   nouveauJoueur = signal({
     prenom: '',
     nom: '',
+    numeroLicence: '',
     nomParent: '',
     telParent: '',
     emailParent: '',
@@ -98,7 +99,7 @@ export class ListeJoueursComponent {
   // Ouverture modale
   gererDemandeAjoutJoueur() {
     this.nouveauJoueur.set({
-      prenom: '', nom: '', nomParent: '', telParent: '', emailParent: '', groupe: null,
+      prenom: '', nom: '',numeroLicence: '', nomParent: '', telParent: '', emailParent: '', groupe: null,
     });
     this.estModaleAjoutJoueurOuverte.set(true);
   }

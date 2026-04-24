@@ -11,6 +11,7 @@ export interface Joueur {
   id: number;
   prenom: string;
   nom: string;
+  numeroLicence?: string
   photoUrl: string;
   nomParent: string;
   telParent: string;
