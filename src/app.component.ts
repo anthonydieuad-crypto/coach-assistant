@@ -21,12 +21,19 @@ export class AppComponent {
     authService = inject(AuthService);
     loaderService = inject(LoaderService);
     isMobileMenuOpen = signal(false);
+    isGenerateMenuOpen = signal(false);
 
     toggleMobileMenu() {
         this.isMobileMenuOpen.update(v => !v);
     }
 
-    closeMobileMenu() {
+    // Fonctions pour le dropdown
+    toggleGenerateMenu() {
+        this.isGenerateMenuOpen.update(v => !v);
+    }
+
+    closeMenus() {
         this.isMobileMenuOpen.set(false);
+        this.isGenerateMenuOpen.set(false);
     }
 }
