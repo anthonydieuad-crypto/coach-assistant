@@ -18,7 +18,6 @@ test.describe('Page de Connexion', () => {
         //On remplit les inputs basés sur tes attributs name ="email" et name="password" 
         await page.fill('input[name="email"]', 'test@mauvais.com');
         await page.fill('input[name="password"]', 'mauvaispass');
-
         await page.click('button[type="submit"]');
 
         //On vérifie le paragraphe d'erreur @if(erreur()) apparaît
