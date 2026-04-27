@@ -11,7 +11,7 @@ export class Changelog {
   private authService = inject(AuthService);
   
   isVisible = signal(false);
-  private readonly CURRENT_VERSION = 'v1.5';
+  private readonly CURRENT_VERSION = 'v1.6';
 
   constructor() {
     // 💡 On utilise un effect pour surveiller l'état de connexion
