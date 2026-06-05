@@ -11,6 +11,7 @@ export interface UtilisateurConnecte {
   role: string;
   nom: string;
   prenom: string;
+  clubId?: number | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -124,6 +125,47 @@ export class AuthService {
   reinitialisationMotDePasse(token:string, password:string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/reset-password`, {token, password});
   }
+  // ==========================================
+  // ✅ NOUVELLES MÉTHODES POUR LE MODE SAAS
+  // ==========================================
+
+  //Création de l'espace de travail (Club)
+  creerClub(nomClub: string): Observable<any> {
+    //On pointe maintenant vers le controller /clubs
+    return this.http.post<any>(`${environment.apiUrl}/clubs/creer`, { nom: nomClub }).pipe(
+      tap(response => {
+        if (response.newToken) {
+          // 1. Remplacement silencieux du Token JWT
+          localStorage.setItem('token', response.newToken);
+
+          // 2. Mise à jour de l'utilisateur actuel (Signal + Storage)
+          const currentUser = this.utilisateurConnecte();
+          if (currentUser) {
+            const updatedUser = { 
+              ...currentUser, 
+              clubId: response.clubId, 
+              role: 'CLUB_ADMIN' // Il devient l'ADMIN de son club.
+            };
+            localStorage.setItem('user_session', JSON.stringify(updatedUser));
+            this.utilisateurConnecte.set(updatedUser); // Le front se met à jour instantanément
+          }
+        }
+      })
+    );
+  }
+
+  // Vérifie si le coach a déjà un club en lisant le payload du token
+  hasClub(): boolean {
+    const token = this.getToken();
+    if (!token) return false;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.clubId !== null && payload.clubId !== undefined;
+    } catch (e) {
+      return false;
+    }
+  }
 
   // --- PRIVÉ ---
 
@@ -132,6 +174,8 @@ export class AuthService {
     if (response.token) {
         localStorage.setItem('token', response.token);
     }
+
+
 
     // 2. Infos User
     const user: UtilisateurConnecte = {

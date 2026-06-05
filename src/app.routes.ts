@@ -16,11 +16,18 @@ import { ResetPassword } from './components/reset-password/reset-password';
 import { Dashboard } from './components/dashboard/dashboard';
 import { FeuilleMatchComponent } from './components/feuille-match/feuille-match-component/feuille-match-component';
 
+// N'oublie pas d'importer ton nouveau composant !
+import { CreateClubComponent } from './components/create-club/create-club.component';
+import { adminGuard } from './guards/admin-guard';
+
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'signup', component: SignupComponent },
     { path: 'forgot-password', component: ForgotPassword },
     { path: 'reset-password', component: ResetPassword },
+    
+    // ✅ AJOUT : La route de création de club, protégée par le Guard
+    { path: 'creer-club', component: CreateClubComponent, canActivate: [authGuard] },
 
     {
         path: '',
@@ -28,7 +35,7 @@ export const routes: Routes = [
         children: [
             { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
             { path: 'dashboard', component: Dashboard},
-            { path: 'admin', component: AdminDashboardComponent },
+            { path: 'admin', component: AdminDashboardComponent, canActivate: [adminGuard] },
             { path: 'calendrier', component: CalendrierComponent },
             { path: 'presences', component: SuiviPresencesComponent },
             { path: 'joueurs', component: ListeJoueursComponent },

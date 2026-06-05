@@ -56,7 +56,7 @@
                         <a routerLink="/bilan-competitions" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
                            class="text-gray-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer whitespace-nowrap border-b-2 border-transparent hover:border-orange-500">Bilan Compétitions</a>
                         
-                        @if (authService.utilisateurConnecte()?.role === 'ADMIN') {
+                        @if (authService.utilisateurConnecte()?.role === 'SUPER_ADMIN') {
                         <a routerLink="/admin" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
                            class="text-purple-400 hover:bg-slate-700 hover:text-white px-3 py-2 rounded-md text-sm font-bold transition-colors cursor-pointer border border-purple-500/20 whitespace-nowrap flex items-center ml-2">
                             <span class="mr-1">🛡️</span> Espace Admin
