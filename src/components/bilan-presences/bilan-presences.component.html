@@ -13,14 +13,38 @@
     </div>
 
     <div class="bg-slate-800/50 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden shadow-xl">
+        
+        <!-- NOUVEAU : Barre de filtrage -->
+        <div class="p-4 border-b border-white/10 bg-slate-900/40 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <h3 class="text-lg font-bold text-white">Détail des présences</h3>
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <label class="text-sm text-gray-400 font-medium whitespace-nowrap">Vue :</label>
+                <select [ngModel]="seanceSelectionneeId()" (ngModelChange)="seanceSelectionneeId.set($event)"
+                        class="bg-slate-900 border border-slate-600 text-amber-500 font-medium text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5 outline-none cursor-pointer">
+                    <option value="all">📊 Bilan Global (Toutes les séances)</option>
+                    <optgroup label="Historique des séances">
+                        @for (seance of entrainementsTries(); track seance.id) {
+                            <option [value]="seance.id">{{ seance.date | date:'dd/MM/yyyy' }} - {{ seance.titre }}</option>
+                        }
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
                 <tr class="bg-slate-900/50 text-gray-400 text-sm uppercase tracking-wider border-b border-white/10">
                     <th class="p-4 font-semibold">Joueur</th>
-                    <th class="p-4 font-semibold text-center">Présences</th>
-                    <th class="p-4 font-semibold text-center">Absences</th>
-                    <th class="p-4 font-semibold text-right">Taux</th>
+                    
+                    <!-- Colonnes dynamiques -->
+                    @if (seanceSelectionneeId() === 'all') {
+                        <th class="p-4 font-semibold text-center">Présences</th>
+                        <th class="p-4 font-semibold text-center">Absences</th>
+                        <th class="p-4 font-semibold text-right">Taux</th>
+                    } @else {
+                        <th class="p-4 font-semibold text-center">Statut lors de la séance</th>
+                    }
                 </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
@@ -30,29 +54,44 @@
                                 {{ joueur.prenom }} {{ joueur.nom }}
                                 <div class="text-xs text-gray-500 font-normal">{{ joueur.groupe || 'Sans groupe' }}</div>
                             </td>
-
-                            <td class="p-4 text-center text-emerald-400 font-bold text-lg">
-                                {{ getNbPresences(joueur.id) }}
-                            </td>
-
-                            <td class="p-4 text-center text-rose-400 font-bold">
-                                {{ totalEntrainements() - getNbPresences(joueur.id) }}
-                            </td>
-
-                            <td class="p-4 text-right">
-                                <div class="flex items-center justify-end gap-3">
-                  <span class="font-bold w-12 text-right"
-                        [ngClass]="getTauxPresence(joueur.id) >= 0.75 ? 'text-emerald-400' : (getTauxPresence(joueur.id) >= 0.5 ? 'text-amber-400' : 'text-rose-400')">
-                    {{ getTauxPresence(joueur.id) | percent:'1.0-0' }}
-                  </span>
-                                    <div class="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
-                                        <div class="h-full rounded-full transition-all"
-                                             [style.width.%]="getTauxPresence(joueur.id) * 100"
-                                             [ngClass]="getTauxPresence(joueur.id) >= 0.75 ? 'bg-emerald-500' : (getTauxPresence(joueur.id) >= 0.5 ? 'bg-amber-500' : 'bg-rose-500')">
+                            
+                            <!-- Cellules dynamiques -->
+                            @if (seanceSelectionneeId() === 'all') {
+                                <td class="p-4 text-center text-emerald-400 font-bold text-lg">
+                                    {{ getNbPresences(joueur.id) }}
+                                </td>
+                                <td class="p-4 text-center text-rose-400 font-bold">
+                                    {{ totalEntrainements() - getNbPresences(joueur.id) }}
+                                </td>
+                                <td class="p-4 text-right">
+                                    <div class="flex items-center justify-end gap-3">
+                                      <span class="font-bold w-12 text-right"
+                                            [ngClass]="getTauxPresence(joueur.id) >= 0.75 ? 'text-emerald-400' : (getTauxPresence(joueur.id) >= 0.5 ? 'text-amber-400' : 'text-rose-400')">
+                                        {{ getTauxPresence(joueur.id) | percent:'1.0-0' }}
+                                      </span>
+                                        <div class="w-24 h-2 bg-slate-700 rounded-full overflow-hidden">
+                                            <div class="h-full rounded-full transition-all"
+                                                 [style.width.%]="getTauxPresence(joueur.id) * 100"
+                                                 [ngClass]="getTauxPresence(joueur.id) >= 0.75 ? 'bg-emerald-500' : (getTauxPresence(joueur.id) >= 0.5 ? 'bg-amber-500' : 'bg-rose-500')">
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </td>
+                                </td>
+                            } @else {
+                                <td class="p-4 text-center">
+                                    @if (estPresentALaSeance(joueur.id)) {
+                                        <span class="inline-flex items-center justify-center px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-sm font-bold">
+                                            <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                            Présent
+                                        </span>
+                                    } @else {
+                                        <span class="inline-flex items-center justify-center px-3 py-1 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30 text-sm font-bold">
+                                            <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
+                                            Absent
+                                        </span>
+                                    }
+                                </td>
+                            }
                         </tr>
                     }
                 </tbody>
