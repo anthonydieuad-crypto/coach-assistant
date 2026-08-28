@@ -54,11 +54,12 @@ export class AdminDashboardComponent implements OnInit {
   changerRole(userId: number, event: Event) {
     const select = event.target as HTMLSelectElement;
     const nouveauRole = select.value;
+    
     this.adminService.updateUserRole(userId, nouveauRole).subscribe({
       next: () => {
         this.toastr.success('Le rôle a été mis à jour avec succès');
         this.users.update(utilisateurs => 
-           utilisateurs.map(u => u.id === userId ? { ...u, role: nouveauRole } : u)
+            utilisateurs.map(u => u.id === userId ? { ...u, role: nouveauRole } : u)
         );
       },
       error: () => {
@@ -87,12 +88,15 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   supprimerClub(club: ClubAdmin) {
-    // Alerte renforcée pour avertir de la purge totale
     if (confirm(`ATTENTION DANGER ⚠️\n\nVoulez-vous vraiment supprimer le club "${club.nom}" ?\n\nCette action est IRRÉVERSIBLE et détruira toutes les données associées : joueurs, calendriers, statistiques et comptes du staff.`)) {
         this.adminService.supprimerClub(club.id).subscribe({
             next: () => {
                 this.toastr.success('Club et données associés supprimés avec succès.');
                 this.clubs.update(list => list.filter(c => c.id !== club.id));
+                
+                // CORRECTION : On rafraîchit immédiatement la liste des utilisateurs
+                // pour faire disparaître les coachs qui ont été purgés avec leur club.
+                this.chargerUtilisateurs(); 
             },
             error: (err) => {
                 this.toastr.error(err.error?.message || 'Impossible de supprimer le club.');

@@ -2,13 +2,14 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { NgClass } from '@angular/common'; // <-- AJOUT ICI
 import { finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-signup',
     standalone: true,
-    imports: [FormsModule, RouterLink],
+    imports: [FormsModule, RouterLink, NgClass], // <-- AJOUT ICI
     templateUrl: './signup.component.html'
 })
 export class SignupComponent implements OnInit {
@@ -23,8 +24,7 @@ export class SignupComponent implements OnInit {
     password = signal('');
     
     typeCompte = signal<'INDEPENDANT' | 'CLUB'>('INDEPENDANT');
-    nomClub = signal('');
-    nomEquipe = signal(''); // NOUVEAU
+    nomClub = signal(''); 
     
     erreur = signal('');
     isLoading = signal(false);
@@ -48,12 +48,6 @@ export class SignupComponent implements OnInit {
             this.erreur.set("Le nom du club est obligatoire pour créer une structure.");
             return;
         }
-        
-        // NOUVEAU : Validation du nom de l'équipe
-        if (!this.invitationToken() && this.typeCompte() === 'INDEPENDANT' && !this.nomEquipe().trim()) {
-            this.erreur.set("Veuillez indiquer le nom de l'équipe que vous entraînez.");
-            return;
-        }
 
         if (this.password().length < 6) {
             this.erreur.set("Le mot de passe doit contenir au moins 6 caractères.");
@@ -69,9 +63,8 @@ export class SignupComponent implements OnInit {
             this.email(), 
             this.password(), 
             this.typeCompte(), 
-            this.nomClub(), 
-            this.invitationToken(),
-            this.nomEquipe() // Transmission de la valeur
+            this.nomClub(),
+            this.invitationToken()
         )
         .pipe(
             finalize(() => this.isLoading.set(false))
