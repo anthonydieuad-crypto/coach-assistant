@@ -1,12 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { JoueurService } from '../../services/joueur.service';
 import { EvenementService } from '../../services/evenement.service';
 
 @Component({
   selector: 'app-bilan-competitions',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './bilan-competitions.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -17,10 +18,19 @@ export class BilanCompetitionsComponent {
   joueurs = this.joueurService.joueurs;
   evenements = this.evenementService.evenements;
 
+  // Signal pour suivre l'option sélectionnée dans le menu déroulant
+  evenementSelectionneId = signal<string>('all');
+
   evenementsCompetition = computed(() => {
     return this.evenements().filter(e =>
         e.type === 'match' || e.type === 'plateau' || e.type === 'tournoi'
     );
+  });
+
+  // Filtre et tri les compétitions (du plus récent au plus ancien) pour la liste déroulante
+  evenementsCompetitionTries = computed(() => {
+    return [...this.evenementsCompetition()]
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   });
 
   // Liste dynamique de tous les groupes existants dans les événements de compétition
@@ -49,6 +59,7 @@ export class BilanCompetitionsComponent {
 
     return listJoueurs.map(joueur => {
       const eventsJoues = listEvent.filter(e => e.participants.includes(joueur.id));
+      
       const datesPresence = new Set(eventsJoues.map(e => e.date));
       const nbJoursPresents = datesPresence.size;
       const pourcentage = totalDates > 0 ? (nbJoursPresents / totalDates) : 0;
@@ -71,4 +82,11 @@ export class BilanCompetitionsComponent {
       };
     }).sort((a, b) => b.pourcentage - a.pourcentage);
   });
+
+  // NOUVEAU : Vérifie si le joueur était présent à la compétition spécifiquement sélectionnée
+  estPresentA(joueurId: number): boolean {
+    const evId = Number(this.evenementSelectionneId());
+    const ev = this.evenementsCompetition().find(e => e.id === evId);
+    return ev ? ev.participants.includes(joueurId) : false;
+  }
 }
