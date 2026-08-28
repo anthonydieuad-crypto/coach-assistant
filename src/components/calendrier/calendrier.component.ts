@@ -1,11 +1,11 @@
-
-import {ChangeDetectionStrategy, Component, computed, inject, OnInit, signal, WritableSignal} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { EvenementService } from '../../services/evenement.service';
 import { JoueurService } from '../../services/joueur.service';
+import { ContexteService } from '../../services/contexte.service';
 import { EvenementCalendrier, TypeEvenement } from '../../models/evenement.model';
-import { groupesJoueur } from '../../models/joueur.model';
 import { ToastrService } from 'ngx-toastr';
 import { Changelog } from '../changelog/changelog';
+import { FormsModule } from '@angular/forms';
 
 interface JourCalendrier {
   date: Date;
@@ -18,47 +18,79 @@ type EtatNouvelEvenement = Omit<EvenementCalendrier, 'id'>;
 @Component({
   selector: 'app-calendrier',
   standalone: true,
-  imports: [Changelog],
+  imports: [Changelog, FormsModule],
   templateUrl: './calendrier.component.html',
   styleUrls: ['./calendrier.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CalendrierComponent implements OnInit{
+export class CalendrierComponent implements OnInit {
   private evenementService = inject(EvenementService);
   private joueurService = inject(JoueurService);
+  private contexteService = inject(ContexteService);
   private toastr = inject(ToastrService);
-  
+
   tousLesEvenements = this.evenementService.evenements;
   tousLesJoueurs = this.joueurService.joueurs;
-  groupesJoueur = groupesJoueur;
-  
+
+  // NOUVEAU : Moteur de filtrage local
+  filtreEquipeId = signal<string | 'all'>('all');
+
+  equipesPresentes = computed(() => {
+    const map = new Map<number, string>();
+    this.tousLesEvenements().forEach(e => {
+        if (e.noeudId && e.equipeNom) {
+            map.set(e.noeudId, e.equipeNom);
+        }
+    });
+    return Array.from(map.entries()).map(([id, nom]) => ({ id, nom })).sort((a, b) => a.nom.localeCompare(b.nom));
+  });
+
+  evenementsFiltres = computed(() => {
+      const filtre = this.filtreEquipeId();
+      const events = this.tousLesEvenements();
+      if (filtre === 'all') return events;
+
+      const filtered = events.filter(e => e.noeudId === Number(filtre));
+      // Fallback de sécurité si le filtre devient obsolète suite à un changement de contexte global
+      if (filtered.length === 0 && events.length > 0) return events; 
+      return filtered;
+  });
+
+  groupesExistants = computed(() => {
+    const groupesSet = new Set<string>();
+    this.tousLesJoueurs().forEach(j => {
+      if (j.groupe && j.groupe.trim()) {
+        groupesSet.add(j.groupe.trim());
+      }
+    });
+    this.joueurService.groupesVirtuels().forEach(g => groupesSet.add(g));
+    return Array.from(groupesSet).sort();
+  });
+
   dateVue = signal(new Date());
-  
   estModaleOuverte = signal(false);
   idEvenementEnEdition = signal<number | null>(null);
-
   nouvelEvenement: WritableSignal<EtatNouvelEvenement> = signal(this.getEtatInitialEvenement());
-  
+
   joursSemaine = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
-    ngOnInit() {
-        const brouillon = this.evenementService.brouillonEvenement();
-
-        if (brouillon) {
-            this.nouvelEvenement.set({
-                titre: brouillon.titre || 'Entraînement',
-                date: brouillon.date || this.formaterDatePourApi(new Date()),
-                type: 'training', // On force le type entraînement
-                lieu: brouillon.lieu || '',
-                participants: brouillon.participants || [], // ✅ On récupère les joueurs
-                equipesAdverses: '',
-                groupe: undefined
-            });
-
-            this.estModaleOuverte.set(true);
-            this.evenementService.brouillonEvenement.set(null);
-        }
-    }
+  ngOnInit() {
+      const brouillon = this.evenementService.brouillonEvenement();
+      if (brouillon) {
+          this.nouvelEvenement.set({
+              titre: brouillon.titre || 'Entraînement',
+              date: brouillon.date || this.formaterDatePourApi(new Date()),
+              type: 'training',
+              lieu: brouillon.lieu || '',
+              participants: brouillon.participants || [],
+              equipesAdverses: '',
+              groupe: undefined,
+              noeudId: this.contexteService.noeudActif()?.id
+          });
+          this.estModaleOuverte.set(true);
+          this.evenementService.brouillonEvenement.set(null);
+      }
+  }
 
   grilleCalendrier = computed<JourCalendrier[]>(() => {
     const date = this.dateVue();
@@ -66,6 +98,7 @@ export class CalendrierComponent implements OnInit{
     const mois = date.getMonth();
     const premierJourDuMois = new Date(annee, mois, 1);
     const dernierJourDuMois = new Date(annee, mois + 1, 0);
+
     const grille: JourCalendrier[] = [];
     const jourDebutSemaine = (premierJourDuMois.getDay() + 6) % 7;
 
@@ -79,22 +112,25 @@ export class CalendrierComponent implements OnInit{
         const jourCourant = new Date(annee, mois, i);
         const dateStr = this.formaterDatePourApi(jourCourant);
         grille.push({ 
-            date: jourCourant, 
-            estMoisCourant: true, 
-            evenements: this.tousLesEvenements().filter(e => e.date === dateStr)
+              date: jourCourant, 
+              estMoisCourant: true, 
+              // UTILISATION DU TABLEAU FILTRÉ
+              evenements: this.evenementsFiltres().filter(e => e.date === dateStr) 
         });
     }
 
     const indexFinGrille = grille.length;
     const joursRestants = (7 - (indexFinGrille % 7)) % 7;
+
     for (let i = 1; i <= joursRestants; i++) {
         const jourMoisSuivant = new Date(dernierJourDuMois);
         jourMoisSuivant.setDate(jourMoisSuivant.getDate() + i);
         grille.push({ date: jourMoisSuivant, estMoisCourant: false, evenements: [] });
     }
+
     return grille;
   });
-  
+
   libelleMoisCourant = computed(() => {
     return this.dateVue().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
   });
@@ -113,7 +149,7 @@ export class CalendrierComponent implements OnInit{
            date.getMonth() === aujourdhui.getMonth() &&
            date.getFullYear() === aujourdhui.getFullYear();
   }
-  
+
   private genererTitre(type: TypeEvenement, date: string): string {
     const libellesType: Record<TypeEvenement, string> = {
         training: 'Entraînement',
@@ -129,6 +165,7 @@ export class CalendrierComponent implements OnInit{
   ouvrirModaleNouveau(date?: Date) {
     const dateCible = date ? this.formaterDatePourApi(date) : this.formaterDatePourApi(new Date());
     const typeInitial: TypeEvenement = 'training';
+    
     this.nouvelEvenement.set({
       ...this.getEtatInitialEvenement(),
       date: dateCible,
@@ -148,7 +185,8 @@ export class CalendrierComponent implements OnInit{
       lieu: evenement.lieu,
       equipesAdverses: evenement.equipesAdverses || '',
       participants: [...evenement.participants],
-      groupe: evenement.groupe
+      groupe: evenement.groupe,
+      noeudId: evenement.noeudId
     });
     this.estModaleOuverte.set(true);
   }
@@ -159,16 +197,20 @@ export class CalendrierComponent implements OnInit{
 
   gererSaisieEvenement(field: keyof EtatNouvelEvenement, event: Event) {
     const value = (event.target as HTMLInputElement).value;
+    
     this.nouvelEvenement.update(current => {
         const misAJour = { ...current, [field]: value === 'null' ? undefined : value };
+        
         if (field === 'date' || field === 'type') {
             misAJour.titre = this.genererTitre(misAJour.type as TypeEvenement, misAJour.date);
         }
-        if (field === 'type' && value !== 'match' && value !== 'plateau'&& value !== 'tournoi') {
+        
+        if (field === 'type' && value !== 'match' && value !== 'plateau' && value !== 'tournoi') {
             misAJour.equipesAdverses = '';
             misAJour.participants = [];
             misAJour.groupe = undefined;
         }
+        
         return misAJour;
     });
   }
@@ -188,7 +230,6 @@ export class CalendrierComponent implements OnInit{
   enregistrerEvenement() {
       const donnees = this.nouvelEvenement();
 
-      // Petite validation basique
       if (!donnees.titre.trim() || !donnees.date || !donnees.lieu.trim()) {
          this.toastr.warning('Veuillez remplir les champs obligatoires (Titre, Date, Lieu)', 'Oups !');
          return;
@@ -201,13 +242,12 @@ export class CalendrierComponent implements OnInit{
             lieu: donnees.lieu.trim(),
             participants: donnees.participants,
             equipesAdverses: donnees.equipesAdverses?.trim() || undefined,
-            groupe: donnees.groupe
+            groupe: donnees.groupe,
+            noeudId: this.contexteService.noeudActif()?.id
       };
 
       const id = this.idEvenementEnEdition();
-
       if (id) {
-          // --- CAS MODIFICATION ---
           this.evenementService.mettreAJourEvenement({ ...evenementAEnregistrer, id }).subscribe({
               next: () => {
                   this.toastr.success('L\'événement a été modifié', 'Succès');
@@ -216,7 +256,6 @@ export class CalendrierComponent implements OnInit{
               error: () => this.toastr.error('Erreur lors de la modification', 'Erreur')
           });
       } else {
-          // --- CAS CRÉATION ---
           this.evenementService.ajouterEvenement(evenementAEnregistrer).subscribe({
               next: () => {
                   this.toastr.success('Nouvel événement ajouté au calendrier', 'C\'est noté !');
@@ -226,7 +265,6 @@ export class CalendrierComponent implements OnInit{
           });
       }
   }
-
 
   private formaterDatePourApi(date: Date): string {
     const annee = date.getFullYear();
@@ -243,19 +281,21 @@ export class CalendrierComponent implements OnInit{
       lieu: '',
       equipesAdverses: '',
       participants: [],
-      groupe: undefined
+      groupe: undefined,
+      noeudId: undefined
     };
   }
-    supprimerEvenement() {
-          const id = this.idEvenementEnEdition();
-          if (id && confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) {
-              this.evenementService.supprimerEvenement(id).subscribe({
-                  next: () => {
-                      this.toastr.info('L\'événement a été supprimé', 'Suppression');
-                      this.fermerModale();
-                  },
-                  error: () => this.toastr.error('Impossible de supprimer', 'Erreur')
-              });
-          }
+
+  supprimerEvenement() {
+      const id = this.idEvenementEnEdition();
+      if (id && confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) {
+          this.evenementService.supprimerEvenement(id).subscribe({
+              next: () => {
+                  this.toastr.info('L\'événement a été supprimé', 'Suppression');
+                  this.fermerModale();
+              },
+              error: () => this.toastr.error('Impossible de supprimer', 'Erreur')
+          });
       }
+  }
 }

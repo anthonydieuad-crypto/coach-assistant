@@ -1,14 +1,14 @@
 <div class="min-h-screen p-6 flex items-start justify-center text-gray-100">
     <div class="bg-slate-800/50 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-2xl w-full max-w-lg mt-10 animate-fade-in">
-
+        
         <div class="flex flex-col items-center mb-8">
             <div class="w-24 h-24 bg-slate-700 rounded-full flex items-center justify-center mb-4 border-4 border-amber-500 shadow-lg">
-                <span class="text-4xl">🧢</span>
+                <span class="text-4xl">👤</span>
             </div>
             @if (authService.utilisateurConnecte(); as user) {
                 <h2 class="text-3xl font-bold text-white">{{ user.prenom }} {{ user.nom }}</h2>
                 <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 text-sm font-semibold mt-2 border border-amber-500/30">
-                    Entraîneur Principal
+                    {{ user.isProprietaire ? 'Créateur du Club' : 'Membre du Staff' }}
                 </span>
             }
         </div>
@@ -21,15 +21,38 @@
                     <p class="text-white font-medium">{{ authService.utilisateurConnecte()?.email }}</p>
                 </div>
             </div>
-
             <div class="bg-slate-900/50 p-4 rounded-xl border border-white/5 flex items-center">
-                <div class="bg-slate-800 p-2 rounded-lg mr-4 text-gray-400">🔑</div>
+                <div class="bg-slate-800 p-2 rounded-lg mr-4 text-gray-400">🛡️</div>
                 <div>
-                    <p class="text-xs text-gray-500 uppercase font-bold">Rôle</p>
-                    <p class="text-white font-medium">Administrateur d'équipe</p>
+                    <p class="text-xs text-gray-500 uppercase font-bold">Droits sur l'équipe</p>
+                    <p class="text-white font-medium">
+                        @if (authService.utilisateurConnecte()?.isProprietaire) {
+                            Administrateur Général
+                        } @else if (authService.utilisateurConnecte()?.niveauAcces === 'GESTION') {
+                            Responsable (Gestion)
+                        } @else if (authService.utilisateurConnecte()?.niveauAcces === 'EDITION') {
+                            Éducateur (Édition)
+                        } @else {
+                            Assistant (Lecture seule)
+                        }
+                    </p>
                 </div>
             </div>
         </div>
+        
+        <!-- MASQUÉ POUR LES MEMBRES DU STAFF : Seul le propriétaire peut archiver ! -->
+        @if (authService.utilisateurConnecte()?.isProprietaire) {
+        <div class="mb-8 p-4 rounded-xl border border-rose-500/30 bg-rose-500/5">
+            <h3 class="text-rose-500 font-bold mb-2 flex items-center">
+               <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+               Zone de danger
+            </h3>
+            <p class="text-sm text-gray-400 mb-4">L'archivage clôturera définitivement les statistiques (présences, jongles, matchs) de l'année en cours pour tout le club.</p>
+            <button (click)="ouvrirModalArchive()" class="w-full py-2.5 bg-rose-600/20 hover:bg-rose-600 text-rose-500 hover:text-white border border-rose-600/50 font-bold rounded-xl transition-all duration-300">
+                Archiver la saison actuelle
+            </button>
+        </div>
+        }
 
         <button (click)="seDeconnecter()"
                 class="w-full group flex items-center justify-center px-4 py-3 bg-rose-600/10 hover:bg-rose-600 text-rose-500 hover:text-white border border-rose-600/30 rounded-xl transition-all duration-300 font-bold">
@@ -38,3 +61,34 @@
         </button>
     </div>
 </div>
+
+@if (isArchiveModalOpen()) {
+    <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl max-w-md w-full p-6 animate-fade-in-down">
+            <h3 class="text-xl font-bold text-amber-500 mb-4 flex items-center">
+                <span class="mr-2">⚠️</span> Clôturer la saison ?
+            </h3>
+            <p class="text-gray-300 text-sm mb-4">
+                Entrez le nom de la nouvelle saison qui va s'ouvrir. Les compteurs de vos joueurs seront remis à zéro.
+            </p>
+            <div class="mb-6">
+                <label class="block text-gray-400 text-xs font-bold mb-2">Nom de la nouvelle saison</label>
+                <input type="text" [(ngModel)]="nomNouvelleSaison"
+                        class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg p-3 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+                       placeholder="Ex: Saison 2027-2028">
+            </div>
+            <div class="flex justify-end space-x-3 mt-8">
+                <button (click)="fermerModal()" [disabled]="isSubmitting()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors font-medium">
+                    Annuler
+                </button>
+                <button (click)="confirmerArchivage()" [disabled]="isSubmitting()" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg transition-colors flex items-center shadow-lg">
+                    @if (isSubmitting()) {
+                        <span class="spinner mr-2"></span> Traitement...
+                    } @else {
+                        Confirmer l'archivage
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+}

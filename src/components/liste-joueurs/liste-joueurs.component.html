@@ -3,24 +3,23 @@
         <h2 class="text-2xl font-bold text-white">Liste des Joueurs</h2>
         
         <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <button (click)="fileInput.click()"
+                    [disabled]="isImporting()"
+                    class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg shadow-md border border-slate-600 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                @if (isImporting()) {
+                    <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-amber-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                    Importation...
+                } @else {
+                    <span class="mr-2 text-lg">📥</span>
+                    Importer (CSV/ Excel)
+                }
+            </button>
+
+            <input #fileInput type="file"
+                   (change)="onFileSelected($event)"
+                   accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                   class="hidden">
             
-            <button (click)="fileInput.click()" 
-        [disabled]="isImporting()" 
-        class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg shadow-md border border-slate-600 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
-    
-    @if (isImporting()) {
-        <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-amber-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-        Importation...
-    } @else {
-        <span class="mr-2 text-lg">📥</span>
-        Importer (CSV/ Exel)
-    }
-</button>
-            
-<input #fileInput type="file" 
-       (change)="onFileSelected($event)" 
-       accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" 
-       class="hidden">
             <button (click)="gererDemandeAjoutJoueur()" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg shadow-md transition-colors duration-300">
                 <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                 Ajouter un joueur
@@ -30,25 +29,32 @@
 
     <div class="mb-6 flex flex-wrap items-center gap-2">
         <span class="text-sm font-semibold text-gray-300 mr-2">Filtrer par groupe:</span>
-        @for (groupe of ['all', 'Equipe 1', 'Equipe 2', 'Equipe 3', 'none']; track groupe) {
-            <button (click)="definirFiltre($any(groupe))"
-                    [ngClass]="filtreActif() === groupe ? 'bg-amber-500 text-slate-900 font-bold' : 'bg-white/10'"
-                    class="px-3 py-1 text-sm font-medium rounded-full transition-colors">
-                {{ groupe === 'all' ? 'Tous' : (groupe === 'none' ? 'Sans groupe' : groupe) }}
-            </button>
+        <button (click)="definirFiltre('all')"
+                [ngClass]="filtreActif() === 'all' ? 'bg-amber-500 text-slate-900 font-bold' : 'bg-white/10 text-gray-300'"
+                class="px-3 py-1 text-sm font-medium rounded-full transition-colors">Tous</button>
+
+        @for (grp of groupesExistants(); track grp) {
+            <button (click)="definirFiltre(grp)"
+                    [ngClass]="filtreActif() === grp ? 'bg-amber-500 text-slate-900 font-bold' : 'bg-white/10 text-gray-300'"
+                    class="px-3 py-1 text-sm font-medium rounded-full transition-colors">{{ grp }}</button>
         }
+        <button (click)="definirFiltre('none')"
+                [ngClass]="filtreActif() === 'none' ? 'bg-amber-500 text-slate-900 font-bold' : 'bg-white/10 text-gray-300'"
+                class="px-3 py-1 text-sm font-medium rounded-full transition-colors">Sans groupe</button>
+
+        <button (click)="ouvrirModaleGestionGroupes()" class="ml-auto flex items-center px-3 py-1 text-sm font-medium rounded-md bg-slate-700 hover:bg-slate-600 text-amber-500 transition-colors border border-slate-600">
+            <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            Gérer les groupes
+        </button>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         @for (joueur of joueursFiltres(); track joueur.id) {
             <div class="relative bg-slate-800/50 backdrop-blur-md rounded-lg shadow-lg border border-white/10 overflow-hidden group">
-
                 <button (click)="gererSupprimerJoueur(joueur); $event.stopPropagation()" class="absolute top-2 right-2 z-10 p-1.5 bg-rose-600/80 hover:bg-rose-700 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 cursor-pointer">
                     <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
-
                 <div (click)="voirDetailJoueur(joueur)" class="cursor-pointer transform transition-transform duration-300 hover:scale-105">
-
                     @if (joueur.photoUrl) {
                         <img [ngSrc]="joueur.photoUrl" [alt]="'Photo de ' + joueur.prenom" width="200" height="200" class="w-full h-48 object-cover" priority>
                     } @else {
@@ -56,22 +62,24 @@
                             <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 24 24"><path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                         </div>
                     }
-
                     <div class="p-4">
                         <h3 class="text-xl font-semibold text-white">{{ joueur.prenom }} {{ joueur.nom }}</h3>
-                        @if (joueur.groupe) {
-                            <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full bg-amber-400/20 text-amber-300 last:mr-0 mr-1 mt-2">
-                {{ joueur.groupe }}
-              </span>
-                        } @else {
-                            <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full bg-slate-400/20 text-slate-300 last:mr-0 mr-1 mt-2">
-                Sans groupe
-              </span>
-                        }
+                        
+                        <div class="flex flex-wrap gap-1 mt-2">
+                            @if (joueur.groupe) {
+                                <span class="text-xs font-semibold px-2 py-1 uppercase rounded-full bg-amber-400/20 text-amber-300">{{ joueur.groupe }}</span>
+                            } @else {
+                                <span class="text-xs font-semibold px-2 py-1 uppercase rounded-full bg-slate-400/20 text-slate-300">Sans groupe</span>
+                            }
+                            @if (joueur.mutationHorsDelai) {
+                                <span class="text-xs font-bold px-2 py-1 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30">Mutation H.D</span>
+                            } @else if (joueur.mutation) {
+                                <span class="text-xs font-bold px-2 py-1 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">Mutation</span>
+                            }
+                        </div>
+
                         <div class="flex items-center mt-2 text-gray-300">
-                            <svg class="w-5 h-5 mr-2 text-sky-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12.75 19.5v-5.25m0 5.25H15M12.75 19.5H10.5m4.5-12.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6 21a2.25 2.25 0 0 1-2.25-2.25V15.75a2.25 2.25 0 0 1 2.25-2.25h12A2.25 2.25 0 0 1 20.25 15.75v3A2.25 2.25 0 0 1 18 21H6Z" />
-                            </svg>
+                            <svg class="w-5 h-5 mr-2 text-sky-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12.75 19.5v-5.25m0 5.25H15M12.75 19.5H10.5m4.5-12.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM6 21a2.25 2.25 0 0 1-2.25-2.25V15.75a2.25 2.25 0 0 1 2.25-2.25h12A2.25 2.25 0 0 1 20.25 15.75v3A2.25 2.25 0 0 1 18 21H6Z" /></svg>
                             <span>Record jongles: <span class="font-bold text-sky-400">{{ getMaxJongles(joueur) }}</span></span>
                         </div>
                         <div class="flex items-center mt-1 text-gray-300">
@@ -87,7 +95,7 @@
     </div>
 
     @if (estModaleAjoutJoueurOuverte()) {
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 z-50 overflow-y-auto">
             <div class="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity" (click)="fermerModaleAjoutJoueur()"></div>
             <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
                 <div class="relative transform overflow-hidden rounded-lg bg-slate-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-slate-700">
@@ -96,7 +104,7 @@
                         <div class="space-y-4">
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label for="prenom"prenom class="block text-sm font-medium text-gray-300">Prénom</label>
+                                    <label for="prenom" class="block text-sm font-medium text-gray-300">Prénom</label>
                                     <input id="prenom" type="text" [value]="nouveauJoueur().prenom" (input)="gererSaisieNouveauJoueur('prenom', $event)" class="mt-1 block w-full rounded-md border-gray-600 bg-slate-700 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2">
                                 </div>
                                 <div>
@@ -104,17 +112,29 @@
                                     <input id="nom" type="text" [value]="nouveauJoueur().nom" (input)="gererSaisieNouveauJoueur('nom', $event)" class="mt-1 block w-full rounded-md border-gray-600 bg-slate-700 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2">
                                 </div>
                             </div>
+                            
+                            <div class="flex gap-4 mt-3">
+                                <label class="flex items-center text-sm text-gray-300 cursor-pointer">
+                                    <input type="checkbox" [checked]="nouveauJoueur().mutation" (change)="gererSaisieNouveauJoueur('mutation', $event)" class="mr-2 rounded border-gray-600 bg-slate-700 text-orange-500 focus:ring-orange-500">
+                                    Mutation
+                                </label>
+                                <label class="flex items-center text-sm text-gray-300 cursor-pointer">
+                                    <input type="checkbox" [checked]="nouveauJoueur().mutationHorsDelai" (change)="gererSaisieNouveauJoueur('mutationHorsDelai', $event)" class="mr-2 rounded border-gray-600 bg-slate-700 text-rose-500 focus:ring-rose-500">
+                                    Mutation Hors Délai
+                                </label>
+                            </div>
+
                             <div>
-                                <div>
                                 <label for="numeroLicence" class="block text-sm font-medium text-gray-300">N° de Licence FFF</label>
                                 <input id="numeroLicence" type="text" [value]="nouveauJoueur().numeroLicence || ''" (input)="gererSaisieNouveauJoueur('numeroLicence', $event)" class="mt-1 block w-full rounded-md border-gray-600 bg-slate-700 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2" placeholder="Ex: 123456789">
                             </div>
-                                <label for="groupe" class="block text-sm font-medium text-gray-300">Groupe</label>
-                                <select id="groupe" [value]="nouveauJoueur().groupe || 'null'" (change)="gererSaisieNouveauJoueur('groupe', $event)" class="mt-1 block w-full rounded-md border-gray-600 bg-slate-700 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2">
-                                    <option value="null">-- Aucun --</option>
-                                    <option value="Equipe 1">Equipe 1</option>
-                                    <option value="Equipe 2">Equipe 2</option>
-                                    <option value="Equipe 3">Equipe 3</option>
+                            <div>
+                                <label for="groupe" class="block text-sm font-medium text-gray-300 mb-1">Groupe</label>
+                                <select id="groupe" [value]="nouveauJoueur().groupe || 'null'" (change)="gererSaisieNouveauJoueur('groupe', $event)" class="block w-full rounded-md border-gray-600 bg-slate-700 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2">
+                                    <option value="null">-- Aucun groupe --</option>
+                                    @for (grp of groupesExistants(); track grp) {
+                                        <option [value]="grp">{{ grp }}</option>
+                                    }
                                 </select>
                             </div>
                             <div class="border-t border-slate-700 pt-4 mt-2">
@@ -139,6 +159,46 @@
                     <div class="bg-slate-700/50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                         <button type="button" (click)="enregistrerNouveauJoueur()" class="inline-flex w-full justify-center rounded-md bg-amber-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-amber-500 sm:ml-3 sm:w-auto">Enregistrer</button>
                         <button type="button" (click)="fermerModaleAjoutJoueur()" class="mt-3 inline-flex w-full justify-center rounded-md bg-slate-600 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-600 hover:bg-slate-500 sm:mt-0 sm:w-auto">Annuler</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (estModaleGestionGroupesOuverte()) {
+        <div class="fixed inset-0 z-50 overflow-y-auto">
+            <div class="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity" (click)="fermerModaleGestionGroupes()"></div>
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                <div class="relative transform overflow-hidden rounded-lg bg-slate-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-slate-700">
+                    <div class="px-6 py-5">
+                        <div class="flex justify-between items-center mb-5">
+                            <h3 class="text-xl font-bold text-white">Gestion des Groupes</h3>
+                            <button (click)="fermerModaleGestionGroupes()" class="text-gray-400 hover:text-white transition-colors">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-4">Renommez ou supprimez un groupe existant. Les modifications s'appliqueront automatiquement à tous les joueurs associés.</p>
+                        <div class="space-y-2 max-h-60 overflow-y-auto pr-2 mb-4">
+                            @for (grp of groupesExistants(); track grp) {
+                                <div class="flex justify-between items-center p-3 bg-slate-900/50 rounded-lg border border-slate-700">
+                                    <span class="text-white font-medium">{{ grp }}</span>
+                                    <div class="flex gap-2">
+                                        <button (click)="renommerGroupeGlobal(grp)" class="p-1.5 text-sky-400 hover:bg-sky-500/20 rounded transition-colors" title="Renommer">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                        </button>
+                                        <button (click)="supprimerGroupeGlobal(grp)" class="p-1.5 text-rose-400 hover:bg-rose-500/20 rounded transition-colors" title="Supprimer">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            } @empty {
+                                <p class="text-center text-slate-500 py-4 italic">Aucun groupe créé pour le moment.</p>
+                            }
+                        </div>
+                        <button (click)="ajouterNouveauGroupeConfig()" class="w-full py-2.5 border border-dashed border-amber-500/50 text-amber-500 hover:bg-amber-500/10 rounded-lg font-semibold transition-colors flex justify-center items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                            Créer un nouveau groupe
+                        </button>
                     </div>
                 </div>
             </div>

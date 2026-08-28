@@ -3,20 +3,18 @@ export interface ScoreJongle {
   score: number;
 }
 
-export type GroupeJoueur = 'Equipe 1' | 'Equipe 2' | 'Equipe 3';
-export const groupesJoueur: GroupeJoueur[] = ['Equipe 1', 'Equipe 2', 'Equipe 3'];
-
-
 export interface Joueur {
   id: number;
   prenom: string;
   nom: string;
-  numeroLicence?: string
+  numeroLicence?: string;
   photoUrl: string;
   nomParent: string;
   telParent: string;
   emailParent: string;
   historiqueJongles: ScoreJongle[];
   presences: string[]; // Dates en format YYYY-MM-DD
-  groupe?: GroupeJoueur | null;
+  groupe?: string | null;
+  mutation: boolean;
+  mutationHorsDelai: boolean;
 }

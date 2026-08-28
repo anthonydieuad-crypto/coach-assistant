@@ -1,5 +1,3 @@
-import { GroupeJoueur } from './joueur.model';
-
 export type TypeEvenement = 'training' | 'plateau' | 'match' | 'cohesion' | 'tournoi';
 
 export interface EvenementCalendrier {
@@ -10,5 +8,7 @@ export interface EvenementCalendrier {
   lieu: string;
   equipesAdverses?: string;
   participants: number[];
-  groupe?: GroupeJoueur;
+  groupe?: string | null;
+  noeudId?: number;
+  equipeNom?: string;
 }

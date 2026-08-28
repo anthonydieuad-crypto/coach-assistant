@@ -1,0 +1,120 @@
+@if (joueur(); as j) {
+    <div class="p-6 min-h-screen text-gray-100 animate-fade-in">
+        <div class="flex justify-between items-center mb-6">
+            <a routerLink="/admin/archives" class="inline-flex items-center text-sky-400 hover:text-sky-300 font-semibold cursor-pointer">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Retour aux archives
+            </a>
+            
+            <div class="bg-slate-800 border border-slate-600 rounded-lg p-2 flex items-center shadow-lg">
+                <label class="text-xs text-gray-400 uppercase font-bold mr-3 ml-2">Voyager dans le temps :</label>
+                <select [ngModel]="saisonActiveId()" (change)="surChangementSaison($event)" class="bg-slate-900 border border-slate-600 rounded px-3 py-1.5 text-amber-500 font-bold outline-none cursor-pointer">
+                    @for(saison of j.saisonsStats; track saison.saisonId) {
+                        <option [value]="saison.saisonId">{{ saison.saisonNom }}</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-start gap-8 bg-slate-800/50 p-8 rounded-2xl border border-sky-500/20 shadow-xl relative overflow-hidden">
+            <!-- Badge Archive -->
+            <div class="absolute top-0 right-0 bg-sky-500/20 text-sky-400 px-6 py-1 font-bold text-xs rounded-bl-xl border-b border-l border-sky-500/30">
+                Mode Lecture Seule
+            </div>
+
+            <div class="relative group">
+                <div class="w-40 h-40 rounded-xl overflow-hidden shadow-2xl border-4 border-slate-700 bg-slate-800">
+                    @if (j.photoUrl) {
+                        <img [ngSrc]="j.photoUrl" width="160" height="160" class="w-full h-full object-cover">
+                    } @else {
+                        <div class="w-full h-full flex items-center justify-center text-slate-500 text-4xl font-bold">
+                            {{ j.prenom.charAt(0) }}
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="flex-1 space-y-4 w-full">
+                <div>
+                    <h1 class="text-4xl font-bold text-white mb-1">{{ j.prenom }} <span class="text-amber-500">{{ j.nom }}</span></h1>
+                    <div class="flex gap-2 mb-2 items-center">
+                        <span class="px-3 py-1 rounded-full text-sm font-medium bg-slate-700 text-gray-300 border border-white/5">
+                            🏢 {{ j.clubNom }}
+                        </span>
+                        @if(j.archive) {
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">Archivé</span>
+                        }
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-sm font-medium border border-amber-500/30 inline-block"
+                            [ngClass]="j.numeroLicence ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-700 text-gray-400'">
+                        @if (j.numeroLicence) {
+                            🪪 {{ j.numeroLicence }}
+                        } @else {
+                            Pas de licence
+                        }
+                    </span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                    <div class="bg-slate-900/50 p-3 rounded-lg border border-white/5">
+                        <p class="text-xs text-gray-400 uppercase">Contact Parent</p>
+                        <p class="font-medium">{{ j.nomParent }}</p>
+                        <p class="text-sm text-gray-300">{{ j.telParent }}</p>
+                        <p class="text-sm text-sky-400">{{ j.emailParent }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if(saisonActiveStats(); as stats) {
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+                
+                <div class="bg-slate-800/50 p-6 rounded-2xl border border-white/10 shadow-lg">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold flex items-center">
+                            <span class="mr-2">📈</span> Historique Jongles
+                        </h3>
+                        <span class="text-sm text-gray-400">Saison : {{ stats.saisonNom }}</span>
+                    </div>
+                    <app-graphique-jongles [historique]="stats.historiqueJongles"></app-graphique-jongles>
+                </div>
+
+                <div class="bg-slate-800/50 p-6 rounded-2xl border border-white/10 shadow-lg flex flex-col">
+                    <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                        <h3 class="text-xl font-bold flex items-center">
+                            <span class="mr-2">📋</span> Convocations & Présences
+                        </h3>
+                        <span class="bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full text-sm font-bold border border-emerald-500/30">
+                            {{ stats.presences.length }} présences enregistrées
+                        </span>
+                    </div>
+
+                    <ul class="space-y-3 flex-1 max-h-[300px] overflow-y-auto pr-2">
+                        @for (evt of evenementsChronologiques(); track evt.id) {
+                            <li class="flex items-center p-3 bg-slate-900/40 rounded-lg border border-white/5">
+                                <div class="w-3 h-3 rounded-full mr-3"
+                                     [ngClass]="evt.type === 'match' ? 'bg-rose-500' : (evt.type === 'tournoi' ? 'bg-purple-500' : 'bg-emerald-500')">
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium text-white">{{ evt.titre }}</p>
+                                    <p class="text-xs text-gray-400">{{ evt.date | date:'dd/MM/yyyy' }} - {{ evt.lieu }}</p>
+                                </div>
+                                <div class="text-xs px-2 py-1 rounded bg-slate-800 border border-white/5 text-gray-400 uppercase">
+                                    {{ evt.type }}
+                                </div>
+                            </li>
+                        } @empty {
+                            <div class="flex flex-col items-center justify-center py-8 text-gray-500 italic">
+                                <span class="text-2xl mb-2">📭</span>
+                                <p>Aucun événement joué par ce joueur cette saison-là.</p>
+                            </div>
+                        }
+                    </ul>
+                </div>
+            </div>
+        } @else {
+            <div class="mt-8 bg-slate-800/50 p-8 rounded-2xl border border-white/10 text-center">
+                <p class="text-gray-400 italic">Ce joueur n'a été rattaché à aucune saison.</p>
+            </div>
+        }
+    </div>
+}

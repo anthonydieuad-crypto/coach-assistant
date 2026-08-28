@@ -3,7 +3,47 @@
         <h1 class="text-3xl font-bold text-amber-500 mb-2 text-center">Rejoindre le Staff</h1>
         <p class="text-gray-400 text-center mb-6 text-sm">Créez votre compte entraîneur</p>
 
+        <!-- Bannière Smart Onboarding -->
+        @if (invitationToken()) {
+            <div class="bg-emerald-500/10 border border-emerald-500/50 rounded-lg p-4 mb-6 shadow-inner animate-fade-in-down">
+                <p class="text-emerald-400 text-sm text-center font-bold flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    Invitation détectée
+                </p>
+                <p class="text-emerald-500/80 text-xs text-center mt-1">Remplissez ce formulaire pour rejoindre l'encadrement du club.</p>
+            </div>
+        }
+
         <form (submit)="$event.preventDefault(); sInscrire()" class="space-y-4">
+            
+            <!-- SELECTION DU TYPE DE COMPTE (Uniquement si pas d'invitation) -->
+            @if (!invitationToken()) {
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <div (click)="typeCompte.set('INDEPENDANT')" 
+                         class="cursor-pointer border rounded-lg p-3 text-center transition-all"
+                         [ngClass]="typeCompte() === 'INDEPENDANT' ? 'bg-amber-500/10 border-amber-500 text-amber-400' : 'bg-slate-900/50 border-slate-700 text-gray-400 hover:border-slate-500'">
+                        <p class="font-bold text-sm mb-1">Indépendant</p>
+                        <p class="text-[10px] opacity-80">Je gère mon équipe seul</p>
+                    </div>
+                    
+                    <div (click)="typeCompte.set('CLUB')" 
+                         class="cursor-pointer border rounded-lg p-3 text-center transition-all"
+                         [ngClass]="typeCompte() === 'CLUB' ? 'bg-amber-500/10 border-amber-500 text-amber-400' : 'bg-slate-900/50 border-slate-700 text-gray-400 hover:border-slate-500'">
+                        <p class="font-bold text-sm mb-1">Club</p>
+                        <p class="text-[10px] opacity-80">Je crée l'organigramme</p>
+                    </div>
+                </div>
+
+                <!-- MODIFICATION : Le champ est désormais affiché pour les deux, avec un label qui s'adapte -->
+                <div class="animate-fade-in-down mb-4">
+                    <label class="text-amber-500 text-sm font-bold block mb-1">
+                        {{ typeCompte() === 'CLUB' ? 'Nom de votre Club *' : 'Nom de votre équipe (Optionnel)' }}
+                    </label>
+                    <input type="text" [ngModel]="nomClub()" (ngModelChange)="nomClub.set($event)" name="nomClub"
+                           class="w-full bg-slate-900 text-white rounded-lg p-3 border border-amber-500/50 focus:border-amber-500 outline-none transition-colors" 
+                           [placeholder]="typeCompte() === 'CLUB' ? 'Ex: FC Voisins' : 'Ex: U13 A'">
+                </div>
+            }
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
@@ -39,7 +79,6 @@
             <button type="submit"
                     [disabled]="isLoading()"
                     class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-lg transition-colors shadow-lg mt-2 flex items-center justify-center">
-
                 @if (isLoading()) {
                     <span class="spinner"></span> Création en cours...
                 } @else {

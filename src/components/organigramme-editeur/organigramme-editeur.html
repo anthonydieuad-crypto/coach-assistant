@@ -1,0 +1,39 @@
+<div class="p-4 sm:p-6 min-h-screen text-gray-100">
+    <div class="mb-8 flex items-center justify-between">
+        <h1 class="text-2xl sm:text-3xl font-bold text-white flex items-center">
+            <span class="mr-3">🌳</span> Éditeur d'Organigramme
+        </h1>
+        <button  (click)="ajouterEquipe()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-lg">
+            + Nouvelle Équipe
+        </button>
+    </div>
+
+    <!-- Zone de Drag & Drop -->
+    <div class="bg-slate-800/50 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-xl max-w-3xl">
+        <div cdkDropList class="space-y-3" (cdkDropListDropped)="onDrop($event)">
+            
+            @for (noeud of noeudsFlat(); track noeud.id) {
+                <div cdkDrag class="bg-slate-700/80 p-4 rounded-lg border border-slate-600 flex items-center justify-between shadow-sm hover:border-amber-500/50 transition-colors group"
+                     [style.margin-left.rem]="noeud.niveau * 2">
+                    
+                    <div class="flex items-center gap-3">
+                        <!-- Poignée de déplacement -->
+                        <div cdkDragHandle class="cursor-grab active:cursor-grabbing text-slate-400 hover:text-amber-500 transition-colors p-1">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+                            </svg>
+                        </div>
+                        <span class="font-bold text-white text-lg">{{ noeud.nom }}</span>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button (click)="renommerEquipe(noeud)" class="p-2 bg-slate-800 hover:bg-sky-600/80 text-sky-400 hover:text-white rounded transition-colors" title="Renommer">✏️</button>
+                        <button (click)="supprimerEquipe(noeud)" class="p-2 bg-slate-800 hover:bg-rose-600/80 text-rose-400 hover:text-white rounded transition-colors" title="Supprimer">🗑️</button>
+                    </div>
+
+                </div>
+            }
+        </div>
+    </div>
+</div>

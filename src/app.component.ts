@@ -3,6 +3,8 @@ import {RouterLink, RouterLinkActive, RouterOutlet} from "@angular/router";
 import {AuthService} from "@/src/services/auth.service";
 import { LoaderService } from './services/loader.service';
 import { Changelog } from "./components/changelog/changelog";
+import { ContexteSelector } from './components/contexte-selector/contexte-selector';
+
 
 @Component({
     selector: 'app-root',
@@ -11,7 +13,8 @@ import { Changelog } from "./components/changelog/changelog";
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
-    Changelog
+    Changelog,
+    ContexteSelector
 ],
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css'],

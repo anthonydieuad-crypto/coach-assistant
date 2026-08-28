@@ -1,14 +1,14 @@
 <div class="p-4 sm:p-6 min-h-screen">
     <div class="mb-6 flex items-center justify-between">
         <div>
-            <h2 class="text-2xl font-bold text-white">⚽ Générer une Feuille de Match</h2>
-            <p class="text-slate-400 mt-1">Sélectionnez jusqu'à 10 joueurs pour générer le document PDF.</p>
+            <h2 class="text-2xl font-bold text-white">Générer une Feuille de Match</h2>
+            <p class="text-slate-400 mt-1">Sélectionnez jusqu'à 11 joueurs. (Max: 4 Mutations dont 1 Hors Délai).</p>
         </div>
         
         <div class="bg-slate-800 rounded-lg p-3 border border-slate-700 text-center">
             <span class="block text-xs text-slate-400 uppercase font-bold tracking-wider">Sélection</span>
-            <span class="text-xl font-bold" [class.text-amber-500]="selectionFeuilleMatch().length === 10" [class.text-white]="selectionFeuilleMatch().length < 10">
-                {{ selectionFeuilleMatch().length }} <span class="text-slate-500 text-sm">/ 10</span>
+            <span class="text-xl font-bold" [class.text-amber-500]="selectionFeuilleMatch().length === 11" [class.text-white]="selectionFeuilleMatch().length < 11">
+                {{ selectionFeuilleMatch().length }} <span class="text-slate-500 text-sm">/ 11</span>
             </span>
         </div>
     </div>
@@ -31,18 +31,27 @@
                     [ngClass]="{
                         'bg-amber-500/10 border-amber-500/50 shadow-[0_0_10px_rgba(245,158,11,0.1)]': selectionFeuilleMatch().includes(joueur.id),
                         'bg-slate-900/80 border-slate-700 hover:border-slate-500': !selectionFeuilleMatch().includes(joueur.id),
-                        'opacity-40 grayscale cursor-not-allowed': !selectionFeuilleMatch().includes(joueur.id) && selectionFeuilleMatch().length >= 10
+                        'opacity-40 grayscale cursor-not-allowed': !selectionFeuilleMatch().includes(joueur.id) && selectionFeuilleMatch().length >= 11
                     }">
                     <input type="checkbox" 
-                        [checked]="selectionFeuilleMatch().includes(joueur.id)"
-                        (change)="basculerSelectionJoueur(joueur.id)"
-                        [disabled]="!selectionFeuilleMatch().includes(joueur.id) && selectionFeuilleMatch().length >= 10"
-                        class="h-5 w-5 rounded border-slate-600 bg-slate-800 text-amber-500 focus:ring-amber-500">
+                           [checked]="selectionFeuilleMatch().includes(joueur.id)"
+                           (change)="basculerSelectionJoueur(joueur.id)"
+                           [disabled]="!selectionFeuilleMatch().includes(joueur.id) && selectionFeuilleMatch().length >= 11"
+                           class="h-5 w-5 rounded border-slate-600 bg-slate-800 text-amber-500 focus:ring-amber-500">
                     
-                    <div class="ml-3">
-                        <div class="text-sm font-bold text-white group-hover:text-amber-400 transition-colors">{{ joueur.nom }} {{ joueur.prenom }}</div>
-                        <div class="text-xs text-slate-500 mt-0.5">
-                            {{ joueur.numeroLicence ? '💳 N° ' + joueur.numeroLicence : '⚠️ Pas de licence' }}
+                    <div class="ml-3 flex-1 flex justify-between items-center">
+                        <div>
+                            <div class="text-sm font-bold text-white group-hover:text-amber-400 transition-colors">{{ joueur.nom }} {{ joueur.prenom }}</div>
+                            <div class="text-xs text-slate-500 mt-0.5">
+                                {{ joueur.numeroLicence ? '🪪 ' + joueur.numeroLicence : '⚠️ Pas de licence' }}
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-1 items-end">
+                            @if (joueur.mutationHorsDelai) {
+                                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30">Mut. H.D</span>
+                            } @else if (joueur.mutation) {
+                                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30">Mutation</span>
+                            }
                         </div>
                     </div>
                 </label>
@@ -69,9 +78,9 @@
                 Télécharger PDF
             </button>
 
-            @if (selectionFeuilleMatch().length >= 10) {
+            @if (selectionFeuilleMatch().length >= 11) {
                 <p class="mt-4 text-xs font-medium text-amber-500 animate-pulse">
-                    💡 Limite de 10 joueurs atteinte.
+                    ⚠️ Limite de 11 joueurs atteinte.
                 </p>
             }
         </div>

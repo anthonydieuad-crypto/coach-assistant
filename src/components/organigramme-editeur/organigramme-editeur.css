@@ -1,0 +1,25 @@
+/* Style de la carte pendant qu'elle est soulevée/déplacée */
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 0.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+  background-color: #334155; /* slate-700 */
+  border: 1px solid #f59e0b; /* amber-500 */
+}
+
+/* Style de l'emplacement vide en attente de la carte */
+.cdk-drag-placeholder {
+  opacity: 0.3;
+  border: 2px dashed #f59e0b;
+  background-color: transparent;
+}
+
+/* Animation fluide de réorganisation des autres cartes */
+.cdk-drop-list-dragging .cdk-drag {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Animation fluide quand la carte est relâchée */
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}

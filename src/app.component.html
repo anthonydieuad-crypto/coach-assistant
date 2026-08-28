@@ -1,16 +1,21 @@
-<div class="min-h-screen text-gray-100 font-sans pb-10">
+<div class="min-h-screen text-gray-100 font-sans pb-10 overflow-x-hidden">
     @if (authService.utilisateurConnecte()) {
     <nav class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 shadow-lg">
-        <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-
+                
+                <!-- LOGO ET SÉLECTEUR DE CONTEXTE -->
                 <div class="flex-shrink-0 flex items-center">
                     <a routerLink="/dashboard" (click)="closeMenus()" class="text-amber-500 font-bold text-xl tracking-wider whitespace-nowrap cursor-pointer hover:text-amber-400 transition-colors">
-                        COACH ASSIST
-                     </a>
+                        COACH ASSIST 
+                    </a>
+                    <div class="hidden sm:block ml-4">
+                        <app-contexte-selector></app-contexte-selector>
+                    </div>
                 </div>
 
-                <div class="hidden md:flex flex-1 items-center justify-end">
+                <!-- MENU DESKTOP -->
+                <div class="hidden xl:flex flex-1 items-center justify-end">
                     <div class="flex items-center space-x-2">
                         <a routerLink="/calendrier" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
                            class="text-gray-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer whitespace-nowrap border-b-2 border-transparent hover:border-orange-500">Calendrier</a>
@@ -20,15 +25,22 @@
                         
                         <a routerLink="/joueurs" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
                            class="text-gray-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer whitespace-nowrap border-b-2 border-transparent hover:border-orange-500">Effectif</a>
+
+                        @if (authService.utilisateurConnecte()?.role === 'ADMIN' || authService.utilisateurConnecte()?.role === 'SUPER_ADMIN' || authService.utilisateurConnecte()?.niveauAcces === 'GESTION') {
+                        <a routerLink="/staff" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
+                           class="text-gray-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer whitespace-nowrap border-b-2 border-transparent hover:border-emerald-500">
+                           Staff & Équipes
+                        </a>
+                        }
                         
                         <div class="relative">
                             <button (click)="toggleGenerateMenu()" 
                                     class="text-gray-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center border-b-2 border-transparent hover:border-orange-500"
                                     [class.bg-slate-900]="isGenerateMenuOpen()"
                                     [class.text-white]="isGenerateMenuOpen()">
-                                <span>Générer</span>
+                                <span>Gérer</span>
                                 <svg class="ml-1 h-4 w-4 transition-transform duration-200" 
-                                     [class.rotate-180]="isGenerateMenuOpen()" 
+                                     [class.rotate-180]="isGenerateMenuOpen()"
                                      fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
@@ -56,10 +68,10 @@
                         <a routerLink="/bilan-competitions" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
                            class="text-gray-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer whitespace-nowrap border-b-2 border-transparent hover:border-orange-500">Bilan Compétitions</a>
                         
-                        @if (authService.utilisateurConnecte()?.role === 'ADMIN') {
+                        @if (authService.utilisateurConnecte()?.role === 'SUPER_ADMIN') {
                         <a routerLink="/admin" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
                            class="text-purple-400 hover:bg-slate-700 hover:text-white px-3 py-2 rounded-md text-sm font-bold transition-colors cursor-pointer border border-purple-500/20 whitespace-nowrap flex items-center ml-2">
-                            <span class="mr-1">🛡️</span> Espace Admin
+                            <span class="mr-1">👑</span> Espace Admin
                         </a>
                         }
                         
@@ -68,22 +80,18 @@
                     </div>
                 </div>
 
-                <div class="flex md:hidden items-center ml-4">
+                <!-- BOUTON MENU MOBILE -->
+                <div class="flex xl:hidden items-center ml-4">
                     <button (click)="toggleMobileMenu()" type="button"
                             class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-white">
                         <span class="sr-only">Ouvrir le menu</span>
                         @if (!isMobileMenuOpen()) {
-                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                             stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M4 6h16M4 12h16M4 18h16"/>
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                         </svg>
-                        }
-                        @else {
-                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                             stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M6 18L18 6M6 6l12 12"/>
+                        } @else {
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                         }
                     </button>
@@ -91,31 +99,42 @@
             </div>
         </div>
 
+        <!-- MENU MOBILE DÉROULANT -->
         @if (isMobileMenuOpen()) {
-        <div class="md:hidden bg-slate-800 border-t border-slate-700 animate-fade-in-down">
+        <div class="xl:hidden bg-slate-800 border-t border-slate-700 animate-fade-in-down">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <a routerLink="/calendrier" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
                    class="text-gray-300 hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Calendrier</a>
+
                 <a routerLink="/presences" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
                    class="text-gray-300 hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Suivi Présences</a>
+
                 <a routerLink="/joueurs" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
                    class="text-gray-300 hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Effectif</a>
                 
-                <div class="px-3 py-2 text-amber-500 text-xs font-bold uppercase tracking-wider border-t border-slate-700 mt-2">Générer</div>
-                <a routerLink="/convocations" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white" 
-                   class="text-gray-300 hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium pl-6">Convocations</a>
-                <a routerLink="/feuille-match" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white" 
-                   class="text-gray-300 hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium pl-6">Feuille de Match</a>
+                @if (authService.utilisateurConnecte()?.role === 'ADMIN' || authService.utilisateurConnecte()?.role === 'SUPER_ADMIN' || authService.utilisateurConnecte()?.niveauAcces === 'GESTION') {
+                <a routerLink="/staff" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
+                   class="text-emerald-400 font-bold hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base border-l-4 border-emerald-500 bg-emerald-500/10 mb-2 mt-2">
+                   Staff & Équipes
+                </a>
+                }
+                
+                <div class="px-3 py-2 text-amber-500 text-xs font-bold uppercase tracking-wider border-t border-slate-700 mt-2">Gérer</div>
+                <a routerLink="/convocations" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
+                    class="text-gray-300 hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium pl-6">Convocations</a>
+                <a routerLink="/feuille-match" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
+                    class="text-gray-300 hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium pl-6">Feuille de Match</a>
                 
                 <a routerLink="/bilan-presences" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
                    class="text-gray-300 hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium border-t border-slate-700 mt-2 pt-2">Bilan Présences</a>
+
                 <a routerLink="/bilan-competitions" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
                    class="text-gray-300 hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Bilan Compétitions</a>
                 
-                @if (authService.utilisateurConnecte()?.role === 'ADMIN') {
+                @if (authService.utilisateurConnecte()?.role === 'SUPER_ADMIN') {
                 <a routerLink="/admin" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
                    class="text-purple-400 font-bold hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base border-l-4 border-purple-500 bg-purple-500/10 mb-2 mt-4">
-                    🛡️ Espace Admin
+                      👑 Espace Admin
                 </a>
                 }
                 
@@ -127,9 +146,11 @@
     </nav>
     }
 
-   <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+   <!-- CORRECTION ICI : max-w-[1400px] pour aligner avec la navbar et donner plus d'espace au tableau -->
+   <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <router-outlet></router-outlet>
         
+        <!-- LOADER GLOBAL -->
         @if (loaderService.isLoading()) {
           <div class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity">
             <div class="flex flex-col items-center bg-slate-800 p-6 rounded-2xl shadow-2xl border border-white/10">
@@ -143,5 +164,5 @@
         }
     </main>
 
-    <app-changelog/> 
+    <app-changelog/>
 </div>

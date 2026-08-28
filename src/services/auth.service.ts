@@ -11,41 +11,37 @@ export interface UtilisateurConnecte {
   role: string;
   nom: string;
   prenom: string;
+  clubId?: string;
+  niveauAcces?: string;
+  isProprietaire?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-
-  // URL de l'API Auth
   private apiUrl = `${environment.apiUrl}/auth`;
 
-  // Signal de l'utilisateur connecté
   utilisateurConnecte = signal<UtilisateurConnecte | null>(this.recupererDepuisStorage());
-
-  //Convertion 2 heures en millisecondes
-  private readonly INACTIVITY_TIMEOUT = 2 * 60 * 1000;
+  private readonly INACTIVITY_TIMEOUT = 2 * 60 * 60 * 1000;
   private timer: any;
 
   constructor() {
     if (this.utilisateurConnecte()) {
       this.initInactivityTimer();
     }
-    //On réagit automatiquement quand l'état de connection change
+
     effect(() => {
-      if (this.utilisateurConnecte()){ 
-      this.initInactivityTimer();  
-      }else{
+      if (this.utilisateurConnecte()){
+       this.initInactivityTimer();
+        }else{
         this.stopInactivityTimer();
       }
     });
   }
 
-  //initialisations des écouteurs d'événements
   private initInactivityTimer() {
-    this.stopInactivityTimer()//on nettoie l'ancien timer si il existe
-
+    this.stopInactivityTimer()
     const activity$ = merge(
       fromEvent(window, 'mousemove'),
       fromEvent(window, 'mousedown'),
@@ -56,11 +52,10 @@ export class AuthService {
 
     activity$.subscribe(() => this.resetTimer());
     this.resetTimer();
-
   }
+
   private resetTimer() {
     if(this.timer) clearTimeout(this.timer);
-
     this.timer = setTimeout(() => {
       console.warn('Déconnexion automatique pour inactivité.');
       this.logout();
@@ -68,40 +63,44 @@ export class AuthService {
   }
 
   private stopInactivityTimer() {
-    if (this.timer) clearTimeout(this.timer) 
+    if (this.timer) clearTimeout(this.timer)
   }
 
-
-  // ✅ LOGIN : On garde le tap pour la sécurité (stockage auto)
   login(email: string, password: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/login`, { email, password }).pipe(
       tap(response => {
         if (response.token) {
-          // On sauvegarde déjà ici pour être sûr
           this.sauvegarderSession(response);
         }
       })
     );
   }
 
-  // ✅ REGISTER
-  inscription(nom: string, prenom: string, email: string, mdp: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/register`, {
+  // NOUVEAU : Paramètre nomEquipe ajouté
+  inscription(nom: string, prenom: string, email: string, mdp: string, typeCompte: string, nomClub: string, token?: string | null, nomEquipe?: string): Observable<any> {
+    const payload: any = {
       nom,
       prenom,
       email,
-      password: mdp
-    }).pipe(
+      password: mdp,
+      typeCompte,
+      nomClub,
+      nomEquipe // Injection dans le backend
+    };
+    
+    if(token){
+      payload.token = token;
+    }       
+    
+    return this.http.post<any>(`${this.apiUrl}/register`, payload).pipe(
       tap(response => {
         if (response.token) {
           this.sauvegarderSession(response);
         }
       })
-      
-    );
+    )
   }
 
-  // ✅ LOGOUT
   logout() {
     this.stopInactivityTimer();
     this.utilisateurConnecte.set(null);
@@ -114,36 +113,36 @@ export class AuthService {
     return localStorage.getItem('token');
   }
 
-
-  //Envoie du mail pour le mot de passe oublié
   demanderReinitialisation(email: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/forgot-password`, {email});
   }
 
-  //Validation du nouveau mot de passe
   reinitialisationMotDePasse(token:string, password:string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/reset-password`, {token, password});
   }
 
-  // --- PRIVÉ ---
-
   private sauvegarderSession(response: any) {
-    // 1. Token
     if (response.token) {
         localStorage.setItem('token', response.token);
+        
+        const payloadBase64 = response.token.split('.')[1];
+        const decodedJson = atob(payloadBase64);
+        const decodedToken = JSON.parse(decodedJson);
+
+        const user: UtilisateurConnecte = {
+          id: response.id,
+          email: response.email,
+          role: response.role,
+          nom: response.nom,
+          prenom: response.prenom,
+          clubId: decodedToken.clubId,
+          niveauAcces: response.niveauAcces,
+          isProprietaire: response.proprietaire !== undefined ? response.proprietaire : response.isProprietaire
+        };
+
+        localStorage.setItem('user_session', JSON.stringify(user));
+        this.utilisateurConnecte.set(user);
     }
-
-    // 2. Infos User
-    const user: UtilisateurConnecte = {
-      id: response.id,
-      email: response.email,
-      role: response.role,
-      nom: response.nom,
-      prenom: response.prenom
-    };
-
-    localStorage.setItem('user_session', JSON.stringify(user));
-    this.utilisateurConnecte.set(user);
   }
 
   private recupererDepuisStorage(): UtilisateurConnecte | null {

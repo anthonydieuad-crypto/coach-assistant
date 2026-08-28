@@ -13,9 +13,11 @@
                 <tr class="bg-slate-900/50 text-gray-400 text-sm uppercase tracking-wider border-b border-white/10">
                     <th class="p-4 font-semibold">Joueur</th>
                     <th class="p-4 font-semibold text-center w-48">Taux de Présence</th>
-                    <th class="p-4 font-semibold text-center text-blue-400">Équipe 1</th>
-                    <th class="p-4 font-semibold text-center text-purple-400">Équipe 2</th>
-                    <th class="p-4 font-semibold text-center text-orange-400">Équipe 3</th>
+                    
+                    <!-- Colonnes dynamiques pour chaque groupe existant -->
+                    @for (grp of groupesDynamiques(); track grp) {
+                        <th class="p-4 font-semibold text-center text-amber-400">{{ grp }}</th>
+                    }
                 </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
@@ -27,7 +29,6 @@
                                     {{ stat.joueur.groupe || 'Sans groupe' }}
                                 </div>
                             </td>
-
                             <td class="p-4">
                                 <div class="flex flex-col justify-center h-full">
                                     <div class="flex justify-between text-xs mb-1">
@@ -42,36 +43,19 @@
                                     </div>
                                 </div>
                             </td>
-
-                            <td class="p-4 text-center">
-                                @if (stat.details.grp1 > 0) {
-                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 font-bold border border-blue-500/30">
-                                        {{ stat.details.grp1 }}
-                                    </span>
-                                } @else {
-                                    <span class="text-gray-600">-</span>
-                                }
-                            </td>
-
-                            <td class="p-4 text-center">
-                                @if (stat.details.grp2 > 0) {
-                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 font-bold border border-purple-500/30">
-                                        {{ stat.details.grp2 }}
-                                    </span>
-                                } @else {
-                                    <span class="text-gray-600">-</span>
-                                }
-                            </td>
-
-                            <td class="p-4 text-center">
-                                @if (stat.details.grp3 > 0) {
-                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-orange-500/20 text-orange-400 font-bold border border-orange-500/30">
-                                        {{ stat.details.grp3 }}
-                                    </span>
-                                } @else {
-                                    <span class="text-gray-600">-</span>
-                                }
-                            </td>
+                            
+                            <!-- Données dynamiques par groupe -->
+                            @for (grp of groupesDynamiques(); track grp) {
+                                <td class="p-4 text-center">
+                                    @if (stat.repartitionParGroupe[grp] > 0) {
+                                        <span class="inline-flex items-center justify-center min-w-[2rem] px-2 py-1 rounded-lg bg-amber-500/20 text-amber-400 font-bold border border-amber-500/30">
+                                            {{ stat.repartitionParGroupe[grp] }}
+                                        </span>
+                                    } @else {
+                                        <span class="text-gray-600">-</span>
+                                    }
+                                </td>
+                            }
                         </tr>
                     }
                 </tbody>
