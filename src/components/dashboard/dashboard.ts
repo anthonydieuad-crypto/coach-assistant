@@ -15,7 +15,7 @@ import { ContexteService } from '@/src/services/contexte.service';
 })
 export class Dashboard implements OnInit, OnDestroy {
   private readonly dashboardService = inject(DashboardService);
-  public readonly authService = inject(AuthService); // RENDU PUBLIC POUR LE TEMPLATE HTML
+  public readonly authService = inject(AuthService); 
   private readonly contexteService = inject(ContexteService);
 
   isLoading = signal<boolean>(true);
@@ -25,19 +25,25 @@ export class Dashboard implements OnInit, OnDestroy {
   private timerInterval: any;
 
   constructor() {
-    effect(() => {
+    effect((onCleanup) => {
       const isConnected = this.authService.utilisateurConnecte();
       const saison = this.contexteService.saisonActive();
       const noeud = this.contexteService.noeudActif();
 
-      if (isConnected) {
-        this.fetchRealData(saison?.id, noeud?.id);
+      // FIX ANTI-SPAM : On crée un délai artificiel pour éviter que l'API
+      // soit appelée frénétiquement lors de l'initialisation des signaux
+      if (isConnected && saison) {
+        const timer = setTimeout(() => {
+          this.fetchRealData(saison.id, noeud?.id);
+        }, 100);
+        
+        onCleanup(() => clearTimeout(timer));
       }
-    })
+    });
   }
 
   ngOnInit(): void {
-    this.fetchRealData();
+    // Le premier fetch est maintenant géré dynamiquement par l'effect()
   }
 
   fetchRealData(saisonId?:number, noeudId?:number) {

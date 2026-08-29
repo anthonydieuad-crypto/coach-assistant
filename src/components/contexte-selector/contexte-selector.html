@@ -1,34 +1,35 @@
-<div class="flex items-center space-x-2 bg-slate-900/60 p-1.5 rounded-lg border border-slate-700 shadow-inner">
-  <!-- Sélecteur de Saison -->
-  <div class="relative">
-    <select 
-       [value]="contexteService.saisonActive()?.id" 
-       (change)="onSaisonChange($event)"
-      class="bg-transparent text-amber-500 font-bold text-xs sm:text-sm border-none outline-none focus:ring-0 py-1 pl-2 pr-6 appearance-none cursor-pointer">
-      @for (saison of saisons(); track saison.id) {
-        <option [value]="saison.id" class="bg-slate-800 text-white">{{ saison.nom }}</option>
-      }
-    </select>
-    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1 text-amber-500">
-      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-    </div>
-  </div>
+<div class="flex items-center space-x-2 bg-slate-900/60 p-1.5 sm:p-2 rounded-lg border border-slate-700 shadow-inner w-full sm:w-auto justify-center">
+   
+   <!-- Sélecteur de Saison -->
+   <div class="relative flex-1 sm:flex-none">
+     <select
+         [value]="contexteService.saisonActive()?.id"
+         (change)="onSaisonChange($event)"
+       class="bg-transparent w-full text-amber-500 font-bold text-xs sm:text-sm border-none outline-none focus:ring-0 py-1 pl-2 pr-6 appearance-none cursor-pointer truncate">
+       @for (saison of saisons(); track saison.id) {
+         <option [value]="saison.id" class="bg-slate-800 text-white">{{ saison.nom }}</option>
+       }
+     </select>
+     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1 text-amber-500">
+       <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+     </div>
+   </div>
 
-  <div class="w-px h-5 bg-slate-600/50"></div>
+   <div class="w-px h-5 bg-slate-600/50"></div>
 
-  <!-- Sélecteur de Nœud (Équipe) -->
-  <div class="relative">
-    <select 
-       [value]="contexteService.noeudActif()?.id" 
-       (change)="onNoeudChange($event)"
-      class="bg-transparent text-white font-medium text-xs sm:text-sm border-none outline-none focus:ring-0 py-1 pl-2 pr-6 appearance-none cursor-pointer truncate max-w-[120px] sm:max-w-[180px]">
-      @for (noeud of noeuds(); track noeud.id) {
-        <!-- NOUVEAU : On utilise la propriété 'nomAffiche' générée par la méthode aplatirArbre -->
-        <option [value]="noeud.id" class="bg-slate-800 text-white">{{ noeud.nomAffiche }}</option>
-      }
-    </select>
-    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1 text-slate-400">
-      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-    </div>
-  </div>
+   <!-- Sélecteur de Nœud (équipe) -->
+   <div class="relative flex-1 sm:flex-none">
+     <select
+         [value]="contexteService.noeudActif()?.id"
+         (change)="onNoeudChange($event)"
+       class="bg-transparent w-full text-white font-medium text-xs sm:text-sm border-none outline-none focus:ring-0 py-1 pl-2 pr-6 appearance-none cursor-pointer truncate">
+       @for (noeud of noeuds(); track noeud.id) {
+         <option [value]="noeud.id" class="bg-slate-800 text-white">{{ noeud.nomAffiche }}</option>
+       }
+     </select>
+     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1 text-slate-400">
+       <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+     </div>
+   </div>
+
 </div>

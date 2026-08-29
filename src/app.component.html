@@ -1,15 +1,17 @@
 <div class="min-h-screen text-gray-100 font-sans pb-10 overflow-x-hidden">
+
     @if (authService.utilisateurConnecte()) {
-    <nav class="bg-slate-800 border-b border-slate-700 sticky top-0 z-50 shadow-lg">
+    <nav class="bg-slate-800 border-b border-slate-700 sticky top-0 z-[60] shadow-lg">
         <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 
-                <!-- LOGO ET SÉLECTEUR DE CONTEXTE -->
+                <!-- LOGO ET SÉLECTEUR DE CONTEXTE DESKTOP -->
                 <div class="flex-shrink-0 flex items-center">
                     <a routerLink="/dashboard" (click)="closeMenus()" class="text-amber-500 font-bold text-xl tracking-wider whitespace-nowrap cursor-pointer hover:text-amber-400 transition-colors">
                         COACH ASSIST 
                     </a>
-                    <div class="hidden sm:block ml-4">
+                    <!-- S'affiche à côté du logo uniquement sur les très grands écrans -->
+                    <div class="hidden xl:block ml-4">
                         <app-contexte-selector></app-contexte-selector>
                     </div>
                 </div>
@@ -35,12 +37,12 @@
                         
                         <div class="relative">
                             <button (click)="toggleGenerateMenu()" 
-                                    class="text-gray-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center border-b-2 border-transparent hover:border-orange-500"
+                                     class="text-gray-300 hover:text-white hover:bg-slate-700 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center border-b-2 border-transparent hover:border-orange-500"
                                     [class.bg-slate-900]="isGenerateMenuOpen()"
                                     [class.text-white]="isGenerateMenuOpen()">
                                 <span>Gérer</span>
                                 <svg class="ml-1 h-4 w-4 transition-transform duration-200" 
-                                     [class.rotate-180]="isGenerateMenuOpen()"
+                                      [class.rotate-180]="isGenerateMenuOpen()"
                                      fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
@@ -99,9 +101,16 @@
             </div>
         </div>
 
+        <!-- NOUVEAU : SÉLECTEUR DE CONTEXTE MOBILE/TABLETTE TOUJOURS VISIBLE -->
+        <!-- S'affiche sous le menu principal tant qu'on n'est pas sur un très grand écran (xl) -->
+        <div class="xl:hidden bg-slate-900/80 backdrop-blur-md border-t border-slate-700 px-4 py-2.5 flex justify-center shadow-inner">
+            <app-contexte-selector class="w-full sm:w-auto"></app-contexte-selector>
+        </div>
+
         <!-- MENU MOBILE DÉROULANT -->
         @if (isMobileMenuOpen()) {
-        <div class="xl:hidden bg-slate-800 border-t border-slate-700 animate-fade-in-down">
+        <!-- Fix: position absolue pour passer PAR-DESSUS le contenu au lieu de le pousser -->
+        <div class="xl:hidden bg-slate-800 border-t border-slate-700 animate-fade-in-down absolute w-full shadow-2xl z-50">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <a routerLink="/calendrier" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
                    class="text-gray-300 hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Calendrier</a>
@@ -120,6 +129,7 @@
                 }
                 
                 <div class="px-3 py-2 text-amber-500 text-xs font-bold uppercase tracking-wider border-t border-slate-700 mt-2">Gérer</div>
+                
                 <a routerLink="/convocations" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
                     class="text-gray-300 hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium pl-6">Convocations</a>
                 <a routerLink="/feuille-match" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
@@ -127,14 +137,13 @@
                 
                 <a routerLink="/bilan-presences" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
                    class="text-gray-300 hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium border-t border-slate-700 mt-2 pt-2">Bilan Présences</a>
-
                 <a routerLink="/bilan-competitions" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
                    class="text-gray-300 hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Bilan Compétitions</a>
                 
                 @if (authService.utilisateurConnecte()?.role === 'SUPER_ADMIN') {
                 <a routerLink="/admin" (click)="closeMenus()" routerLinkActive="bg-slate-900 text-white"
                    class="text-purple-400 font-bold hover:bg-slate-700 hover:text-white block px-3 py-2 rounded-md text-base border-l-4 border-purple-500 bg-purple-500/10 mb-2 mt-4">
-                      👑 Espace Admin
+                        👑 Espace Admin
                 </a>
                 }
                 
@@ -146,7 +155,6 @@
     </nav>
     }
 
-   <!-- CORRECTION ICI : max-w-[1400px] pour aligner avec la navbar et donner plus d'espace au tableau -->
    <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <router-outlet></router-outlet>
         
@@ -163,6 +171,5 @@
           </div>
         }
     </main>
-
     <app-changelog/>
 </div>

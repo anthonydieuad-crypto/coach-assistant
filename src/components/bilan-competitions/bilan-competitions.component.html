@@ -1,17 +1,17 @@
-<div class="p-6 min-h-screen text-gray-100">
+<div class="p-4 sm:p-6 min-h-screen text-gray-100">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <h2 class="text-2xl font-bold">Bilan Compétitions</h2>
-        <span class="bg-slate-800 border border-amber-500/30 text-amber-500 px-3 py-1 rounded-full text-sm font-medium">
+        <span class="bg-slate-800 border border-amber-500/30 text-amber-500 px-3 py-1 rounded-full text-xs sm:text-sm font-medium">
             Matchs, Plateaux & Tournois
         </span>
     </div>
 
     <div class="bg-slate-800/50 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden shadow-xl">
         
-        <!-- NOUVEAU : Barre de filtrage -->
+        <!-- Barre de filtrage -->
         <div class="p-4 border-b border-white/10 bg-slate-900/40 flex flex-col sm:flex-row justify-between items-center gap-4">
             <h3 class="text-lg font-bold text-white">Détail des convocations</h3>
-            <div class="flex items-center gap-3 w-full sm:w-auto">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
                 <label class="text-sm text-gray-400 font-medium whitespace-nowrap">Vue :</label>
                 <select [ngModel]="evenementSelectionneId()" (ngModelChange)="evenementSelectionneId.set($event)"
                         class="bg-slate-900 border border-slate-600 text-amber-500 font-medium text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5 outline-none cursor-pointer">
@@ -25,16 +25,63 @@
             </div>
         </div>
 
-        <div class="overflow-x-auto">
+        <!-- Vue Mobile (Cartes) -->
+        <div class="md:hidden flex flex-col divide-y divide-white/5">
+            @for (stat of statsJoueurs(); track stat.joueur.id) {
+                <div class="p-4 hover:bg-white/5 transition-colors">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <div class="font-medium text-white text-lg">{{ stat.joueur.prenom }} {{ stat.joueur.nom }}</div>
+                            <div class="text-xs text-gray-500 font-normal">{{ stat.joueur.groupe || 'Sans groupe' }}</div>
+                        </div>
+                        
+                        <!-- Partie dynamique -->
+                        @if (evenementSelectionneId() !== 'all') {
+                            @if (estPresentA(stat.joueur.id)) {
+                                <span class="inline-flex items-center px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30">
+                                    <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                    Convoqué(e)
+                                </span>
+                            } @else {
+                                <span class="inline-flex items-center px-2 py-1 rounded-lg bg-slate-700/50 text-slate-400 text-xs font-bold border border-slate-600/50">
+                                    Non convoqué(e)
+                                </span>
+                            }
+                        } @else {
+                            <div class="text-right">
+                                <div class="font-bold text-xl" [ngClass]="stat.pourcentage >= 0.75 ? 'text-emerald-400' : (stat.pourcentage >= 0.5 ? 'text-amber-400' : 'text-rose-400')">
+                                    {{ stat.pourcentage | percent:'1.0-0' }}
+                                </div>
+                                <div class="text-xs text-gray-500">{{ stat.nbJoursPresents }} dates</div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Tags Groupes Uniquement en Bilan Global -->
+                    @if (evenementSelectionneId() === 'all') {
+                        <div class="flex flex-wrap gap-2 mt-2">
+                            @for (grp of groupesDynamiques(); track grp) {
+                                @if (stat.repartitionParGroupe[grp] > 0) {
+                                    <span class="text-xs bg-slate-900 border border-white/10 px-2 py-1.5 rounded-md text-gray-300">
+                                        {{ grp }}: <strong class="text-amber-400 ml-1">{{ stat.repartitionParGroupe[grp] }}</strong>
+                                    </span>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Vue Desktop (Tableau) -->
+        <div class="hidden md:block overflow-x-auto w-full">
             <table class="w-full text-left border-collapse">
                 <thead>
                 <tr class="bg-slate-900/50 text-gray-400 text-sm uppercase tracking-wider border-b border-white/10">
                     <th class="p-4 font-semibold">Joueur</th>
                     
-                    <!-- Colonnes dynamiques -->
                     @if (evenementSelectionneId() === 'all') {
                         <th class="p-4 font-semibold text-center w-48">Taux de Présence</th>
-                        <!-- Colonnes dynamiques pour chaque groupe existant -->
                         @for (grp of groupesDynamiques(); track grp) {
                             <th class="p-4 font-semibold text-center text-amber-400">{{ grp }}</th>
                         }
@@ -53,7 +100,6 @@
                                 </div>
                             </td>
                             
-                            <!-- Cellules dynamiques -->
                             @if (evenementSelectionneId() === 'all') {
                                 <td class="p-4">
                                     <div class="flex flex-col justify-center h-full">
@@ -70,7 +116,6 @@
                                     </div>
                                 </td>
                                 
-                                <!-- Données dynamiques par groupe -->
                                 @for (grp of groupesDynamiques(); track grp) {
                                     <td class="p-4 text-center">
                                         @if (stat.repartitionParGroupe[grp] > 0) {
@@ -90,7 +135,7 @@
                                             Convoqué(e)
                                         </span>
                                     } @else {
-                                        <span class="inline-flex items-center justify-center px-3 py-1 rounded-full bg-slate-700/50 text-slate-500 border border-slate-600/50 text-sm font-bold">
+                                        <span class="inline-flex items-center justify-center px-3 py-1 rounded-full bg-slate-700/50 text-slate-400 border border-slate-600/50 text-sm font-bold">
                                             Non convoqué(e)
                                         </span>
                                     }

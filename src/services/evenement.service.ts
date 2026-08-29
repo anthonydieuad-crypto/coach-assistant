@@ -1,61 +1,65 @@
-import { Injectable, inject, signal, effect } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { EvenementCalendrier } from '../models/evenement.model';
 import { environment } from '../environments/environment';
 import { AuthService } from "./auth.service";
-import { tap } from 'rxjs/operators';
+import { tap, switchMap, catchError, debounceTime } from 'rxjs/operators';
 import { ContexteService } from './contexte.service';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { combineLatest, of } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class EvenementService {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
-  private contexteService = inject(ContexteService)
+  private contexteService = inject(ContexteService);
   private apiUrl = `${environment.apiUrl}/evenements`;
 
   private etatEvenements = signal<EvenementCalendrier[]>([]);
   evenements = this.etatEvenements.asReadonly();
-
   brouillonEvenement = signal<Partial<EvenementCalendrier> | null>(null);
 
-  constructor() {
-    effect(() => {
-      const isConnected = this.authService.utilisateurConnecte();
-      const saison = this.contexteService.saisonActive();
-      const noeud = this.contexteService.noeudActif();
+  private triggerReload = signal(0);
 
-      if (isConnected) {
-        this.chargerEvenements();
-      } else {
-        this.etatEvenements.set([]);
-      }
+  constructor() {
+    const user$ = toObservable(this.authService.utilisateurConnecte);
+    const saison$ = toObservable(this.contexteService.saisonActive);
+    const noeud$ = toObservable(this.contexteService.noeudActif);
+    const reload$ = toObservable(this.triggerReload);
+
+    combineLatest([user$, saison$, noeud$, reload$]).pipe(
+      // FIX ANTI-SPAM : On attend 100ms que les filtres se stabilisent
+      debounceTime(100),
+      switchMap(([user, saison, noeud, _]) => {
+        if (!user) {
+          return of([]); 
+        }
+        
+        let params = new HttpParams();
+        if (saison) params = params.set('saisonId', saison.id.toString());
+        if (noeud) params = params.set('noeudId', noeud.id.toString());
+        
+        return this.http.get<EvenementCalendrier[]>(this.apiUrl, { params }).pipe(
+          catchError(err => {
+            console.error('Erreur chargement événements', err);
+            return of([]); 
+          })
+        );
+      })
+    ).subscribe(data => {
+      const dataTrie = data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      this.etatEvenements.set(dataTrie);
     });
   }
 
   chargerEvenements() {
-    if (!this.authService.utilisateurConnecte()) return;
-    
-    let params = new HttpParams();
-    const saison = this.contexteService.saisonActive();
-    const noeud = this.contexteService.noeudActif();
-    
-    if (saison) params = params.set('saisonId', saison.id.toString());
-    if (noeud) params = params.set('noeudId', noeud.id.toString());
-
-    this.http.get<EvenementCalendrier[]>(this.apiUrl, {params}).subscribe({
-       next: (data) => {
-       const dataTrie = data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-       this.etatEvenements.set(dataTrie);
-       },
-       error: (err) => console.error('Erreur chargement', err)
-       });
+    this.triggerReload.update(v => v + 1);
   }
 
   ajouterEvenement(evenement: Omit<EvenementCalendrier, 'id'>) {
     if (!this.authService.utilisateurConnecte()) throw new Error("Non connecté");
-         
     return this.http.post<EvenementCalendrier>(this.apiUrl, evenement).pipe(
       tap((nouvelEvent) => {
         this.etatEvenements.update(liste => [...liste, nouvelEvent]);

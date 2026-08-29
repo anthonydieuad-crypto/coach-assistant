@@ -1,7 +1,7 @@
-<div class="p-6 min-h-screen text-gray-100">
+<div class="p-4 sm:p-6 min-h-screen text-gray-100">
     <h2 class="text-2xl font-bold mb-6">Bilan des Présences à l'Entraînement</h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8">
         <div class="bg-slate-800/50 p-6 rounded-xl border border-white/10 shadow-lg">
             <h3 class="text-gray-400 text-sm font-medium">Séances Totales</h3>
             <p class="text-3xl font-bold text-white mt-2">{{ totalEntrainements() }}</p>
@@ -14,10 +14,10 @@
 
     <div class="bg-slate-800/50 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden shadow-xl">
         
-        <!-- NOUVEAU : Barre de filtrage -->
+        <!-- Barre de filtrage -->
         <div class="p-4 border-b border-white/10 bg-slate-900/40 flex flex-col sm:flex-row justify-between items-center gap-4">
             <h3 class="text-lg font-bold text-white">Détail des présences</h3>
-            <div class="flex items-center gap-3 w-full sm:w-auto">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
                 <label class="text-sm text-gray-400 font-medium whitespace-nowrap">Vue :</label>
                 <select [ngModel]="seanceSelectionneeId()" (ngModelChange)="seanceSelectionneeId.set($event)"
                         class="bg-slate-900 border border-slate-600 text-amber-500 font-medium text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block w-full p-2.5 outline-none cursor-pointer">
@@ -31,13 +31,58 @@
             </div>
         </div>
 
-        <div class="overflow-x-auto">
+        <!-- Vue Mobile (Cartes) -->
+        <div class="md:hidden flex flex-col divide-y divide-white/5">
+            @for (joueur of joueurs(); track joueur.id) {
+                <div class="p-4 hover:bg-white/5 transition-colors">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <div class="font-medium text-white text-lg">{{ joueur.prenom }} {{ joueur.nom }}</div>
+                            <div class="text-xs text-gray-500 font-normal">{{ joueur.groupe || 'Sans groupe' }}</div>
+                        </div>
+                        
+                        <!-- Partie dynamique (Séance spécifique) -->
+                        @if (seanceSelectionneeId() !== 'all') {
+                            @if (estPresentALaSeance(joueur.id)) {
+                                <span class="inline-flex items-center px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30">
+                                    <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                    Présent
+                                </span>
+                            } @else {
+                                <span class="inline-flex items-center px-2 py-1 rounded-lg bg-rose-500/20 text-rose-400 text-xs font-bold border border-rose-500/30">
+                                    <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
+                                    Absent
+                                </span>
+                            }
+                        }
+                    </div>
+
+                    <!-- Partie dynamique (Bilan global) -->
+                    @if (seanceSelectionneeId() === 'all') {
+                        <div class="flex items-center justify-between bg-slate-900/50 p-3 rounded-lg border border-white/5">
+                            <div class="flex gap-4 text-sm">
+                                <span class="text-emerald-400 font-bold">{{ getNbPresences(joueur.id) }} prés.</span>
+                                <span class="text-rose-400 font-bold">{{ totalEntrainements() - getNbPresences(joueur.id) }} abs.</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-lg"
+                                      [ngClass]="getTauxPresence(joueur.id) >= 0.75 ? 'text-emerald-400' : (getTauxPresence(joueur.id) >= 0.5 ? 'text-amber-400' : 'text-rose-400')">
+                                    {{ getTauxPresence(joueur.id) | percent:'1.0-0' }}
+                                </span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Vue Desktop (Tableau) -->
+        <div class="hidden md:block overflow-x-auto w-full">
             <table class="w-full text-left border-collapse">
                 <thead>
                 <tr class="bg-slate-900/50 text-gray-400 text-sm uppercase tracking-wider border-b border-white/10">
                     <th class="p-4 font-semibold">Joueur</th>
                     
-                    <!-- Colonnes dynamiques -->
                     @if (seanceSelectionneeId() === 'all') {
                         <th class="p-4 font-semibold text-center">Présences</th>
                         <th class="p-4 font-semibold text-center">Absences</th>
@@ -55,7 +100,6 @@
                                 <div class="text-xs text-gray-500 font-normal">{{ joueur.groupe || 'Sans groupe' }}</div>
                             </td>
                             
-                            <!-- Cellules dynamiques -->
                             @if (seanceSelectionneeId() === 'all') {
                                 <td class="p-4 text-center text-emerald-400 font-bold text-lg">
                                     {{ getNbPresences(joueur.id) }}
