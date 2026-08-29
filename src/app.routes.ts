@@ -22,6 +22,9 @@ import { FeuilleMatchComponent } from './components/feuille-match/feuille-match-
 import { GestionStaff } from '@/src/components/gestion-staff/gestion-staff';
 import { AdminJoueurDetail } from './components/admin-joueur-details/admin-joueur-details';
 
+// IMPORT DE LA NOUVELLE PAGE CONTACT
+import { Contact } from './components/contact/contact';
+
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'signup', component: SignupComponent },
@@ -49,6 +52,9 @@ export const routes: Routes = [
             { path: 'staff', component: GestionStaff, canActivate: [adminGuard] },
             { path: 'feuille-match', component: FeuilleMatchComponent },
             { path: 'convocations', component: GenerateurConvocationComponent },
+            
+            // NOUVELLE ROUTE SÉCURISÉE
+            { path: 'contact', component: Contact }
         ]
     },
     { path: '**', redirectTo: 'login' }

@@ -6,41 +6,56 @@
             <div class="p-6">
                 <div class="flex items-center justify-between mb-5">
                     <h3 class="text-2xl font-bold text-white flex items-center">
-                        <span class="mr-2">🚀</span> Quoi de neuf ?
+                        <span class="mr-2">🎉</span> Quoi de neuf ?
                     </h3>
                     <span class="bg-amber-500/20 text-amber-400 text-xs font-bold px-2.5 py-1 rounded-full border border-amber-500/30">
-                        Version 1.6 </span>
+                        Version 2.0
+                    </span>
                 </div>
 
                 <div class="space-y-4 text-gray-300">
+                    
                     <div class="flex gap-3">
-                        <div class="flex-shrink-0 mt-1 text-amber-500 text-xl">⚽</div>
+                        <div class="flex-shrink-0 mt-1 text-amber-500 text-xl">🏢</div>
                         <div>
-                            <strong class="text-white block">Feuille de Match (PDF)</strong>
-                            <span class="text-sm">Générez l'étiquette officielle FFF (calibrée au millimètre) à coller sur vos feuilles de plateau. Fini la réécriture dans les vestiaires !</span>
+                            <strong class="text-white block">Passage en Mode Club</strong>
+                            <span class="text-sm">Créez l'organigramme de votre club et invitez vos coachs et adjoints par e-mail à rejoindre vos équipes.</span>
                         </div>
                     </div>
 
                     <div class="flex gap-3">
-                        <div class="flex-shrink-0 mt-1 text-amber-500 text-xl">📄</div>
+                        <div class="flex-shrink-0 mt-1 text-amber-500 text-xl">⏳</div>
                         <div>
-                            <strong class="text-white block">Nouveau menu "Générer"</strong>
-                            <span class="text-sm">Un accès ultra-rapide à vos documents. Retrouvez vos Convocations et la Feuille de Match directement depuis la barre de navigation.</span>
+                            <strong class="text-white block">Gestion des Saisons</strong>
+                            <span class="text-sm">Clôturez l'année sportive ! L'historique complet est archivé sans polluer l'affichage de votre nouvelle saison.</span>
                         </div>
                     </div>
 
                     <div class="flex gap-3">
-                        <div class="flex-shrink-0 mt-1 text-amber-500 text-xl">💳</div>
+                        <div class="flex-shrink-0 mt-1 text-amber-500 text-xl">⚡</div>
                         <div>
-                            <strong class="text-white block">Affichage des licences</strong>
-                            <span class="text-sm">Visualisez en un clin d'œil les numéros de licence, ou repérez facilement les joueurs sans licence directement sur leurs cartes.</span>
+                            <strong class="text-white block">Navigation Multi-Équipes</strong>
+                            <span class="text-sm">Passez d'une équipe ou d'une saison à l'autre en un clic grâce au nouveau sélecteur fixé en haut de l'écran.</span>
                         </div>
                     </div>
+
+                    <div class="flex gap-3 bg-slate-900/50 p-3 rounded-xl border border-amber-500/20">
+                        <div class="flex-shrink-0 mt-0.5 text-amber-400 text-xl">💡</div>
+                        <div>
+                            <strong class="text-white block">Une idée ou un problème ?</strong>
+                            <span class="text-xs text-gray-400 block mb-1">Votre avis compte énormément pour faire progresser l'application.</span>
+                            <a routerLink="/contact" (click)="fermer()"
+                               class="text-xs text-amber-400 hover:text-amber-300 font-bold underline inline-flex items-center cursor-pointer">
+                                Écrire directement au support &rarr;
+                            </a>
+                        </div>
+                    </div>
+
                 </div>
                 
-                <div class="mt-8">
+                <div class="mt-6">
                     <button (click)="fermer()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 px-4 rounded-lg transition-colors shadow-lg active:scale-95">
-                        Génial, on y va !
+                        Découvrir la V2
                     </button>
                 </div>
             </div>

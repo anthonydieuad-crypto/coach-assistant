@@ -1,9 +1,11 @@
 import { Component, inject, effect, signal } from '@angular/core';
-import { AuthService } from '../../services/auth.service'; 
+import { AuthService } from '../../services/auth.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-changelog',
   standalone: true,
+  imports: [RouterLink],
   templateUrl: './changelog.html',
   styleUrl: './changelog.css',
 })
@@ -11,15 +13,13 @@ export class Changelog {
   private authService = inject(AuthService);
   
   isVisible = signal(false);
-  private readonly CURRENT_VERSION = 'v1.6';
+  private readonly CURRENT_VERSION = 'v2.0';
 
   constructor() {
-    // 💡 On utilise un effect pour surveiller l'état de connexion
     effect(() => {
       const estConnecte = this.authService.utilisateurConnecte();
       const savedVersion = localStorage.getItem('changelog_version');
-
-      // On n'affiche la modale QUE si l'utilisateur est connecté ET que la version diffère
+      
       if (estConnecte && savedVersion !== this.CURRENT_VERSION) {
         this.isVisible.set(true);
       } else {

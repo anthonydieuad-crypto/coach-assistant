@@ -1,0 +1,48 @@
+<div class="p-4 sm:p-6 min-h-screen text-gray-100 flex items-start justify-center">
+    <div class="bg-slate-800/50 backdrop-blur-md rounded-2xl border border-white/10 p-6 sm:p-8 shadow-2xl w-full max-w-2xl mt-4 sm:mt-10 animate-fade-in-down">
+        
+        <div class="flex items-center mb-6 border-b border-white/10 pb-4">
+            <div class="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center mr-4 border border-amber-500/30">
+                <svg class="w-6 h-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-white">Contact & Support</h1>
+                <p class="text-sm text-gray-400 mt-1">Une idée pour améliorer Coach Assistant ? Un bug à signaler ? Écrivez-nous directement.</p>
+            </div>
+        </div>
+
+        <form (submit)="$event.preventDefault(); envoyer()" class="space-y-6">
+            <div>
+                <label class="block text-sm font-bold text-gray-300 uppercase mb-2">Sujet de votre message</label>
+                <select [ngModel]="sujet()" (ngModelChange)="sujet.set($event)" name="sujet"
+                        class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-amber-500 outline-none transition-colors">
+                    <option value="Amélioration / Idée">💡 Proposer une amélioration</option>
+                    <option value="Problème Technique">🛠️ Signaler un problème technique</option>
+                    <option value="Question">❓ Poser une question</option>
+                    <option value="Autre">💬 Autre</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-gray-300 uppercase mb-2">Votre message</label>
+                <textarea [ngModel]="message()" (ngModelChange)="message.set($event)" name="message" rows="6" required
+                          class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white focus:border-amber-500 outline-none transition-colors resize-none"
+                          placeholder="Décrivez votre idée ou votre problème en détails..."></textarea>
+            </div>
+
+            <div class="flex justify-end pt-2">
+                <button type="submit" [disabled]="isSubmitting() || !message()"
+                        class="w-full sm:w-auto bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 px-8 rounded-lg transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
+                    @if (isSubmitting()) {
+                        <span class="spinner w-5 h-5 mr-2 border-2"></span> Envoi en cours...
+                    } @else {
+                        Envoyer le message
+                    }
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
