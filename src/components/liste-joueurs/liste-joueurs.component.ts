@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { NgClass, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { JoueurService } from '../../services/joueur.service';
 import { EvenementService } from '../../services/evenement.service';
@@ -11,7 +11,7 @@ import { finalize } from 'rxjs';
 @Component({
   selector: 'app-liste-joueurs',
   standalone: true,
-  imports: [NgClass, FormsModule],
+  imports: [NgClass, FormsModule, NgOptimizedImage],
   templateUrl: './liste-joueurs.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -63,7 +63,6 @@ export class ListeJoueursComponent {
     });
   });
 
-  // VERROU TEMPOREL RESTAURÉ
   totalEntrainements = computed(() => {
     const today = new Date();
     const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
@@ -209,7 +208,6 @@ export class ListeJoueursComponent {
     return Math.max(...joueur.historiqueJongles.map(h => h.score));
   }
 
-  // VERROU TEMPOREL RESTAURÉ
   getPourcentagePresence(joueur: Joueur): number {
     const total = this.totalEntrainements();
     if (total === 0) return 0;
