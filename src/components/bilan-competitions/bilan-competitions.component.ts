@@ -21,9 +21,16 @@ export class BilanCompetitionsComponent {
   // Signal pour suivre l'option sélectionnée dans le menu déroulant
   evenementSelectionneId = signal<string>('all');
 
+  // FIX : On exclut strictement les événements futurs
   evenementsCompetition = computed(() => {
+    const today = new Date();
+    const annee = today.getFullYear();
+    const mois = String(today.getMonth() + 1).padStart(2, '0');
+    const jour = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${annee}-${mois}-${jour}`;
+
     return this.evenements().filter(e =>
-        e.type === 'match' || e.type === 'plateau' || e.type === 'tournoi'
+        (e.type === 'match' || e.type === 'plateau' || e.type === 'tournoi') && e.date <= todayStr
     );
   });
 
@@ -62,6 +69,7 @@ export class BilanCompetitionsComponent {
       
       const datesPresence = new Set(eventsJoues.map(e => e.date));
       const nbJoursPresents = datesPresence.size;
+
       const pourcentage = totalDates > 0 ? (nbJoursPresents / totalDates) : 0;
 
       // Décompte dynamique par groupe

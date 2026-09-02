@@ -21,14 +21,21 @@ export class BilanPresencesComponent {
   // Signal pour suivre l'option sélectionnée dans le menu déroulant
   seanceSelectionneeId = signal<string>('all');
 
-  // Filtre et tri les entraînements (du plus récent au plus ancien) pour la liste déroulante
+  // Filtre et tri les entraînements (du plus récent au plus ancien)
+  // FIX : On exclut strictement les séances futures
   entrainementsTries = computed(() => {
+    const today = new Date();
+    const annee = today.getFullYear();
+    const mois = String(today.getMonth() + 1).padStart(2, '0');
+    const jour = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${annee}-${mois}-${jour}`;
+
     return this.evenements()
-      .filter(e => e.type === 'training')
+      .filter(e => e.type === 'training' && e.date <= todayStr)
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   });
 
-  // 1. Total des entraînements
+  // 1. Total des entraînements (passés)
   totalEntrainements = computed(() => {
     return this.entrainementsTries().length;
   });
@@ -45,7 +52,7 @@ export class BilanPresencesComponent {
     return this.getNbPresences(joueurId) / total;
   }
 
-  // 4. NOUVEAU : Vérifie si le joueur était présent à la séance spécifiquement sélectionnée
+  // 4. Vérifie si le joueur était présent à la séance spécifiquement sélectionnée
   estPresentALaSeance(joueurId: number): boolean {
     const seanceId = Number(this.seanceSelectionneeId());
     const seance = this.entrainementsTries().find(e => e.id === seanceId);

@@ -10,11 +10,10 @@
                     <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-amber-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
                     Importation...
                 } @else {
-                    <span class="mr-2 text-lg">📥</span>
+                    <span class="mr-2 text-lg">📁</span>
                     Importer (CSV/ Excel)
                 }
             </button>
-
             <input #fileInput type="file"
                    (change)="onFileSelected($event)"
                    accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
@@ -32,7 +31,6 @@
         <button (click)="definirFiltre('all')"
                 [ngClass]="filtreActif() === 'all' ? 'bg-amber-500 text-slate-900 font-bold' : 'bg-white/10 text-gray-300'"
                 class="px-3 py-1 text-sm font-medium rounded-full transition-colors">Tous</button>
-
         @for (grp of groupesExistants(); track grp) {
             <button (click)="definirFiltre(grp)"
                     [ngClass]="filtreActif() === grp ? 'bg-amber-500 text-slate-900 font-bold' : 'bg-white/10 text-gray-300'"
@@ -55,6 +53,8 @@
                     <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
                 <div (click)="voirDetailJoueur(joueur)" class="cursor-pointer transform transition-transform duration-300 hover:scale-105">
+                    
+                    <!-- RESTAURATION DU NgOptimizedImage -->
                     @if (joueur.photoUrl) {
                         <img [ngSrc]="joueur.photoUrl" [alt]="'Photo de ' + joueur.prenom" width="200" height="200" class="w-full h-48 object-cover" priority>
                     } @else {
@@ -62,6 +62,7 @@
                             <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 24 24"><path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                         </div>
                     }
+                    
                     <div class="p-4">
                         <h3 class="text-xl font-semibold text-white">{{ joueur.prenom }} {{ joueur.nom }}</h3>
                         
@@ -128,6 +129,7 @@
                                 <label for="numeroLicence" class="block text-sm font-medium text-gray-300">N° de Licence FFF</label>
                                 <input id="numeroLicence" type="text" [value]="nouveauJoueur().numeroLicence || ''" (input)="gererSaisieNouveauJoueur('numeroLicence', $event)" class="mt-1 block w-full rounded-md border-gray-600 bg-slate-700 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2" placeholder="Ex: 123456789">
                             </div>
+
                             <div>
                                 <label for="groupe" class="block text-sm font-medium text-gray-300 mb-1">Groupe</label>
                                 <select id="groupe" [value]="nouveauJoueur().groupe || 'null'" (change)="gererSaisieNouveauJoueur('groupe', $event)" class="block w-full rounded-md border-gray-600 bg-slate-700 text-white shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm p-2">
@@ -137,6 +139,7 @@
                                     }
                                 </select>
                             </div>
+
                             <div class="border-t border-slate-700 pt-4 mt-2">
                                 <p class="text-xs text-gray-400 uppercase font-bold mb-3">Contact Parent</p>
                                 <div class="space-y-3">
@@ -177,7 +180,9 @@
                                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
+                        
                         <p class="text-sm text-gray-400 mb-4">Renommez ou supprimez un groupe existant. Les modifications s'appliqueront automatiquement à tous les joueurs associés.</p>
+
                         <div class="space-y-2 max-h-60 overflow-y-auto pr-2 mb-4">
                             @for (grp of groupesExistants(); track grp) {
                                 <div class="flex justify-between items-center p-3 bg-slate-900/50 rounded-lg border border-slate-700">
@@ -195,6 +200,7 @@
                                 <p class="text-center text-slate-500 py-4 italic">Aucun groupe créé pour le moment.</p>
                             }
                         </div>
+
                         <button (click)="ajouterNouveauGroupeConfig()" class="w-full py-2.5 border border-dashed border-amber-500/50 text-amber-500 hover:bg-amber-500/10 rounded-lg font-semibold transition-colors flex justify-center items-center">
                             <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                             Créer un nouveau groupe

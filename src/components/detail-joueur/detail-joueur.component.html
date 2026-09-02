@@ -4,9 +4,12 @@
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
             Retour à l'effectif
         </a>
+
         <div class="flex flex-col md:flex-row items-start gap-8 bg-slate-800/50 p-8 rounded-2xl border border-white/10 shadow-xl">
             <div class="relative group">
                 <div class="w-40 h-40 rounded-xl overflow-hidden shadow-2xl border-4 border-slate-700 bg-slate-800">
+                    
+                    <!-- RESTAURATION DU NgOptimizedImage -->
                     @if (j.photoUrl) {
                         <img [ngSrc]="j.photoUrl" width="160" height="160" class="w-full h-full object-cover">
                     } @else {
@@ -14,15 +17,18 @@
                             {{ j.prenom.charAt(0) }}
                         </div>
                     }
+
                 </div>
                 @if(modeEdition()) {
                     <input type="text" [(ngModel)]="editionForm().photoUrl" placeholder="URL Photo" class="mt-2 w-full text-xs bg-slate-900 border border-slate-600 rounded p-1">
                 }
             </div>
+
             <div class="flex-1 space-y-4 w-full">
                 @if (!modeEdition()) {
                     <div>
                         <h1 class="text-4xl font-bold text-white mb-1">{{ j.prenom }} <span class="text-amber-500">{{ j.nom }}</span></h1>
+                        
                         <div class="flex gap-2 mb-2 items-center">
                             <span class="px-3 py-1 rounded-full text-sm font-medium bg-slate-700 text-gray-300 border border-white/5">
                                 {{ j.groupe || 'Aucun groupe' }}
@@ -33,15 +39,17 @@
                                 <span class="px-3 py-1 rounded-full text-xs font-bold bg-orange-500/20 text-orange-400 border border-orange-500/30">Mutation</span>
                             }
                         </div>
+
                         <span class="px-3 py-1 rounded-full text-sm font-medium border border-amber-500/30 inline-block"
                               [ngClass]="j.numeroLicence ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-700 text-gray-400'">
                             @if (j.numeroLicence) {
-                                🪪 {{ j.numeroLicence }}
+                                  {{ j.numeroLicence }}
                             } @else {
                                 Pas de licence
                             }
                         </span>
                     </div>
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                         <div class="bg-slate-900/50 p-3 rounded-lg border border-white/5">
                             <p class="text-xs text-gray-400 uppercase">Contact</p>
@@ -53,10 +61,11 @@
                 } @else {
                     <div class="mb-6 border-b border-white/10 pb-4">
                         <h2 class="text-2xl font-bold text-white flex items-center">
-                            <span class="mr-2">✏️</span> Modification du profil
+                            <span class="mr-2">⚙️</span> Modification du profil
                         </h2>
                         <p class="text-sm text-gray-400">Modifiez les informations personnelles et de contact du joueur.</p>
                     </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="text-xs text-gray-500">Prénom</label>
@@ -93,6 +102,7 @@
                         <label class="text-xs text-gray-500">N° de Licence FFF</label>
                         <input [(ngModel)]="editionForm().numeroLicence" placeholder="Numéro de licence" class="w-full bg-slate-900 border border-slate-600 rounded px-3 py-2 text-white">
                     </div>
+
                     <div class="bg-slate-900/50 p-3 rounded-lg border border-amber-500/30">
                         <p class="text-xs text-amber-500 uppercase mb-2 font-bold">Contact Parent</p>
                         <div class="space-y-2">
@@ -103,17 +113,18 @@
                     </div>
                 }
             </div>
+
             <div class="flex flex-col gap-2">
                 @if (!modeEdition()) {
                     <button (click)="activerEdition()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg shadow transition-colors flex items-center justify-center">
-                        ✏️ Modifier
+                          Modifier
                     </button>
                     <button (click)="supprimerJoueur()" class="px-4 py-2 bg-rose-900/30 text-rose-400 border border-rose-500/30 rounded-lg hover:bg-rose-900/50 transition-colors">
-                        🗑️ Supprimer
+                          Supprimer
                     </button>
                 } @else {
                     <button (click)="sauvegarderModification()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg shadow transition-colors font-bold">
-                        💾 Sauvegarder
+                          Sauvegarder
                     </button>
                     <button (click)="annulerEdition()" class="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg transition-colors">
                         Annuler
@@ -127,19 +138,23 @@
                 <h3 class="text-xl font-bold mb-4 flex items-center">
                     <span class="mr-2">📈</span> Progression Jongles
                 </h3>
+                
                 <div class="flex gap-2 mb-6">
                     <input #scoreInput type="number" placeholder="Nouveau score" class="bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-white w-full">
                     <button (click)="ajouterScore(scoreInput.value); scoreInput.value=''" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-bold">
                         Ajouter
                     </button>
                 </div>
+
                 <app-graphique-jongles [historique]="j.historiqueJongles"></app-graphique-jongles>
             </div>
+
             <div class="bg-slate-800/50 p-6 rounded-2xl border border-white/10 shadow-lg flex flex-col">
                 <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                     <h3 class="text-xl font-bold flex items-center">
-                        <span class="mr-2">📋</span> Convocations
+                        <span class="mr-2">📅</span> Convocations
                     </h3>
+                    
                     <div class="flex bg-slate-900/50 rounded-lg p-1 border border-white/5">
                         <button (click)="changerFiltre('all')"
                                 [class.bg-slate-700]="filtreActif() === 'all'"
@@ -164,6 +179,7 @@
                         </button>
                     </div>
                 </div>
+
                 <ul class="space-y-3 flex-1">
                     @for (evt of evenementsVisibles(); track evt.id) {
                         <li class="flex items-center p-3 bg-slate-900/40 rounded-lg border border-white/5 animate-fade-in">
@@ -180,14 +196,15 @@
                         </li>
                     } @empty {
                         <div class="flex flex-col items-center justify-center py-8 text-gray-500 italic">
-                            <span class="text-2xl mb-2">📭</span>
+                            <span class="text-2xl mb-2">🤷</span>
                             <p>Aucune convocation trouvée.</p>
                         </div>
                     }
                 </ul>
+
                 @if (resteDesEvenements()) {
                     <button (click)="voirPlus()" class="mt-4 w-full py-2 bg-slate-700/50 hover:bg-slate-700 text-gray-300 rounded-lg text-sm font-medium transition-colors border border-white/5">
-                        ⬇️ Voir plus d'événements
+                          Voir plus d'événements
                     </button>
                 }
                 @if (limiteAffichage() > 5 && evenementsFiltres().length > 5) {

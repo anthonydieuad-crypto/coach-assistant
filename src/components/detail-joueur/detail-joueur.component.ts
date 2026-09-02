@@ -24,7 +24,7 @@ export class DetailJoueurComponent implements OnInit {
   joueur = signal<Joueur | undefined>(undefined);
   modeEdition = signal(false);
   editionForm = signal<Partial<Joueur>>({});
-
+  
   filtreActif = signal<'all' | 'match' | 'plateau' | 'tournoi'>('all');
   limiteAffichage = signal(5);
 
@@ -43,6 +43,7 @@ export class DetailJoueurComponent implements OnInit {
     const j = this.joueur();
     const tousEvents = this.evenementService.evenements();
     if (!j) return [];
+    
     return tousEvents
         .filter(e => e.participants.includes(j.id))
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -66,6 +67,7 @@ export class DetailJoueurComponent implements OnInit {
   ngOnInit() {
       const id = Number(this.route.snapshot.paramMap.get('id'));
       const joueurTrouve = this.joueurService.joueurs().find(j => j.id === id);
+      
       if (joueurTrouve) {
           this.joueur.set(joueurTrouve);
       } else {
@@ -133,8 +135,10 @@ export class DetailJoueurComponent implements OnInit {
   ajouterScore(valeur: string) {
     const score = parseInt(valeur);
     const j = this.joueur();
+    
     if (j && !isNaN(score)) {
         const today = new Date().toISOString().split('T')[0];
+        
         this.joueurService.ajouterScoreJongle(j.id, today, score).subscribe({
             next: (joueurMaj) => {
                this.joueur.set(joueurMaj);

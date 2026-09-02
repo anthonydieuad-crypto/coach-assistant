@@ -23,9 +23,10 @@ export class ListeJoueursComponent {
 
   joueurs = this.joueurService.joueurs;
   tousLesEvenements = this.evenementService.evenements;
-  isImporting = signal(false);
 
+  isImporting = signal(false);
   filtreActif = signal<string>('all');
+
   estModaleAjoutJoueurOuverte = signal(false);
   estModaleGestionGroupesOuverte = signal(false);
 
@@ -47,8 +48,19 @@ export class ListeJoueursComponent {
     return this.joueurs().filter(j => j.groupe === filtre);
   });
 
+  // Calcul des entraînements passés uniquement
+  entrainementsPasses = computed(() => {
+    const today = new Date();
+    const annee = today.getFullYear();
+    const mois = String(today.getMonth() + 1).padStart(2, '0');
+    const jour = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${annee}-${mois}-${jour}`;
+
+    return this.tousLesEvenements().filter(e => e.type === 'training' && e.date <= todayStr);
+  });
+
   totalEntrainements = computed(() => {
-    return this.tousLesEvenements().filter(e => e.type === 'training').length;
+    return this.entrainementsPasses().length;
   });
 
   nouveauJoueur = signal({
@@ -190,12 +202,15 @@ export class ListeJoueursComponent {
     return Math.max(...joueur.historiqueJongles.map(h => h.score));
   }
 
+  // Taux basé uniquement sur les entraînements passés
   getPourcentagePresence(joueur: Joueur): number {
     const total = this.totalEntrainements();
     if (total === 0) return 0;
-    const nbPresences = this.tousLesEvenements().filter(e =>
-        e.type === 'training' && e.participants.includes(joueur.id)
+
+    const nbPresences = this.entrainementsPasses().filter(e =>
+        e.participants.includes(joueur.id)
     ).length;
+
     return Math.round((nbPresences / total) * 100);
   }
 }
