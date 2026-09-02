@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { NgOptimizedImage, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { JoueurService } from '../../services/joueur.service';
 import { EvenementService } from '../../services/evenement.service';
@@ -11,7 +11,7 @@ import { finalize } from 'rxjs';
 @Component({
   selector: 'app-liste-joueurs',
   standalone: true,
-  imports: [NgOptimizedImage, NgClass, FormsModule],
+  imports: [NgClass, FormsModule],
   templateUrl: './liste-joueurs.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -26,7 +26,7 @@ export class ListeJoueursComponent {
   isImporting = signal(false);
   
   filtreActif = signal<string>('all');
-  recherche = signal<string>(''); // NOUVEAU SIGNAL
+  recherche = signal<string>('');
   
   estModaleAjoutJoueurOuverte = signal(false);
   estModaleGestionGroupesOuverte = signal(false);
@@ -42,7 +42,6 @@ export class ListeJoueursComponent {
     return Array.from(groupesSet).sort();
   });
 
-  // MISE À JOUR : Combinaison du filtre de groupe et de la recherche textuelle
   joueursFiltres = computed(() => {
     const filtre = this.filtreActif();
     const terme = this.recherche().toLowerCase().trim();
@@ -64,10 +63,11 @@ export class ListeJoueursComponent {
     });
   });
 
-  // ... [Le reste de ton code reste strictement identique] ...
-  
+  // VERROU TEMPOREL RESTAURÉ
   totalEntrainements = computed(() => {
-    return this.tousLesEvenements().filter(e => e.type === 'training').length;
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    return this.tousLesEvenements().filter(e => e.type === 'training' && e.date <= todayStr).length;
   });
 
   nouveauJoueur = signal({
@@ -209,12 +209,18 @@ export class ListeJoueursComponent {
     return Math.max(...joueur.historiqueJongles.map(h => h.score));
   }
 
+  // VERROU TEMPOREL RESTAURÉ
   getPourcentagePresence(joueur: Joueur): number {
     const total = this.totalEntrainements();
     if (total === 0) return 0;
+    
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    
     const nbPresences = this.tousLesEvenements().filter(e =>
-        e.type === 'training' && e.participants.includes(joueur.id)
+        e.type === 'training' && e.participants.includes(joueur.id) && e.date <= todayStr
     ).length;
+    
     return Math.round((nbPresences / total) * 100);
   }
 }

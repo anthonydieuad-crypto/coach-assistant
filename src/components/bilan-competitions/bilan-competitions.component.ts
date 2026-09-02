@@ -18,29 +18,23 @@ export class BilanCompetitionsComponent {
   joueurs = this.joueurService.joueurs;
   evenements = this.evenementService.evenements;
 
-  // Signal pour suivre l'option sélectionnée dans le menu déroulant
   evenementSelectionneId = signal<string>('all');
 
-  // FIX : On exclut strictement les événements futurs
+  // VERROU TEMPOREL RESTAURÉ
   evenementsCompetition = computed(() => {
     const today = new Date();
-    const annee = today.getFullYear();
-    const mois = String(today.getMonth() + 1).padStart(2, '0');
-    const jour = String(today.getDate()).padStart(2, '0');
-    const todayStr = `${annee}-${mois}-${jour}`;
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
     return this.evenements().filter(e =>
         (e.type === 'match' || e.type === 'plateau' || e.type === 'tournoi') && e.date <= todayStr
     );
   });
 
-  // Filtre et tri les compétitions (du plus récent au plus ancien) pour la liste déroulante
   evenementsCompetitionTries = computed(() => {
     return [...this.evenementsCompetition()]
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   });
 
-  // Liste dynamique de tous les groupes existants dans les événements de compétition
   groupesDynamiques = computed(() => {
     const grpSet = new Set<string>();
     this.evenementsCompetition().forEach(e => {
@@ -72,7 +66,6 @@ export class BilanCompetitionsComponent {
 
       const pourcentage = totalDates > 0 ? (nbJoursPresents / totalDates) : 0;
 
-      // Décompte dynamique par groupe
       const repartitionParGroupe: Record<string, number> = {};
       groupes.forEach(grp => repartitionParGroupe[grp] = 0);
 
@@ -91,7 +84,6 @@ export class BilanCompetitionsComponent {
     }).sort((a, b) => b.pourcentage - a.pourcentage);
   });
 
-  // NOUVEAU : Vérifie si le joueur était présent à la compétition spécifiquement sélectionnée
   estPresentA(joueurId: number): boolean {
     const evId = Number(this.evenementSelectionneId());
     const ev = this.evenementsCompetition().find(e => e.id === evId);
