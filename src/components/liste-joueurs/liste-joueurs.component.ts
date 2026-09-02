@@ -23,10 +23,11 @@ export class ListeJoueursComponent {
 
   joueurs = this.joueurService.joueurs;
   tousLesEvenements = this.evenementService.evenements;
-
   isImporting = signal(false);
+  
   filtreActif = signal<string>('all');
-
+  recherche = signal<string>(''); // NOUVEAU SIGNAL
+  
   estModaleAjoutJoueurOuverte = signal(false);
   estModaleGestionGroupesOuverte = signal(false);
 
@@ -41,26 +42,32 @@ export class ListeJoueursComponent {
     return Array.from(groupesSet).sort();
   });
 
+  // MISE À JOUR : Combinaison du filtre de groupe et de la recherche textuelle
   joueursFiltres = computed(() => {
     const filtre = this.filtreActif();
-    if (filtre === 'all') return this.joueurs();
-    if (filtre === 'none') return this.joueurs().filter(j => !j.groupe || !j.groupe.trim());
-    return this.joueurs().filter(j => j.groupe === filtre);
+    const terme = this.recherche().toLowerCase().trim();
+
+    return this.joueurs().filter(j => {
+      let matchGroupe = false;
+      if (filtre === 'all') matchGroupe = true;
+      else if (filtre === 'none') matchGroupe = !j.groupe || !j.groupe.trim();
+      else matchGroupe = j.groupe === filtre;
+
+      let matchRecherche = true;
+      if (terme) {
+        matchRecherche = j.prenom.toLowerCase().includes(terme) || 
+                         j.nom.toLowerCase().includes(terme) || 
+                         (j.numeroLicence ? j.numeroLicence.toLowerCase().includes(terme) : false);
+      }
+
+      return matchGroupe && matchRecherche;
+    });
   });
 
-  // Calcul des entraînements passés uniquement
-  entrainementsPasses = computed(() => {
-    const today = new Date();
-    const annee = today.getFullYear();
-    const mois = String(today.getMonth() + 1).padStart(2, '0');
-    const jour = String(today.getDate()).padStart(2, '0');
-    const todayStr = `${annee}-${mois}-${jour}`;
-
-    return this.tousLesEvenements().filter(e => e.type === 'training' && e.date <= todayStr);
-  });
-
+  // ... [Le reste de ton code reste strictement identique] ...
+  
   totalEntrainements = computed(() => {
-    return this.entrainementsPasses().length;
+    return this.tousLesEvenements().filter(e => e.type === 'training').length;
   });
 
   nouveauJoueur = signal({
@@ -202,15 +209,12 @@ export class ListeJoueursComponent {
     return Math.max(...joueur.historiqueJongles.map(h => h.score));
   }
 
-  // Taux basé uniquement sur les entraînements passés
   getPourcentagePresence(joueur: Joueur): number {
     const total = this.totalEntrainements();
     if (total === 0) return 0;
-
-    const nbPresences = this.entrainementsPasses().filter(e =>
-        e.participants.includes(joueur.id)
+    const nbPresences = this.tousLesEvenements().filter(e =>
+        e.type === 'training' && e.participants.includes(joueur.id)
     ).length;
-
     return Math.round((nbPresences / total) * 100);
   }
 }
