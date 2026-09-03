@@ -1,7 +1,7 @@
 <div class="p-4 sm:p-6 min-h-screen">
     <div class="mb-6 flex items-center justify-between">
         <div>
-            <h2 class="text-2xl font-bold text-white">Générer une Feuille de Match</h2>
+            <h2 class="text-2xl font-bold text-white">Gérer une Feuille de Match</h2>
             <p class="text-slate-400 mt-1">Sélectionnez jusqu'à 11 joueurs. (Max: 4 Mutations dont 1 Hors Délai).</p>
         </div>
         
@@ -33,17 +33,17 @@
                         'bg-slate-900/80 border-slate-700 hover:border-slate-500': !selectionFeuilleMatch().includes(joueur.id),
                         'opacity-40 grayscale cursor-not-allowed': !selectionFeuilleMatch().includes(joueur.id) && selectionFeuilleMatch().length >= 11
                     }">
-                    <input type="checkbox" 
-                           [checked]="selectionFeuilleMatch().includes(joueur.id)"
-                           (change)="basculerSelectionJoueur(joueur.id)"
+                    <input type="checkbox"
+                            [checked]="selectionFeuilleMatch().includes(joueur.id)"
+                           (click)="basculerSelectionJoueur(joueur.id, $event)"
                            [disabled]="!selectionFeuilleMatch().includes(joueur.id) && selectionFeuilleMatch().length >= 11"
                            class="h-5 w-5 rounded border-slate-600 bg-slate-800 text-amber-500 focus:ring-amber-500">
-                    
+                                        
                     <div class="ml-3 flex-1 flex justify-between items-center">
                         <div>
                             <div class="text-sm font-bold text-white group-hover:text-amber-400 transition-colors">{{ joueur.nom }} {{ joueur.prenom }}</div>
                             <div class="text-xs text-slate-500 mt-0.5">
-                                {{ joueur.numeroLicence ? '🪪 ' + joueur.numeroLicence : '⚠️ Pas de licence' }}
+                                {{ joueur.numeroLicence ? 'N° ' + joueur.numeroLicence : 'Pas de licence' }}
                             </div>
                         </div>
                         <div class="flex flex-col gap-1 items-end">
@@ -66,7 +66,7 @@
                 <span class="text-3xl">📄</span>
             </div>
             
-            <h3 class="text-lg font-bold text-white mb-2">Prêt à générer ?</h3>
+            <h3 class="text-lg font-bold text-white mb-2">Prêt à imprimer ?</h3>
             <p class="text-sm text-slate-400 mb-8">
                 Le document contiendra les noms, prénoms et numéros de licence des joueurs sélectionnés, au format officiel FFF.
             </p>

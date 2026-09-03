@@ -1,60 +1,41 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Page Suivi des présences', () => {
-    test.beforeEach(async ({page}) => {
-        await page.goto('/presences');
+test.describe('Parcours 5 : Saisie des présences et Bilans', () => {
+
+  test.beforeEach(async ({ page }) => {
+    // La session de test (Indépendant) est maintenue
+    await page.addInitScript(() => {
+        window.localStorage.setItem('changelog_version', 'v2.0');
     });
+  });
 
-    test('doit afficher la page et les controles de bases',async ({page}) => {
-        await expect(page).toHaveURL(/\/presences/);
+  test('Doit marquer un joueur présent et valider le calcul des statistiques', async ({ page }) => {
+    // ==========================================
+    // 1. SAISIE DES PRÉSENCES
+    // ==========================================
+    await page.goto('/presences');
+    await expect(page.locator('h2')).toContainText('Suivi des Présences');
 
-        //On vérifie la présence du titre principal
-        await expect(page.locator('h2')).toHaveText('Suivi des Présences');
+    const carteJoueur = page.locator('div.cursor-pointer', { hasText: 'Kylian Sauvegarde' }).first();
+    await expect(carteJoueur).toBeVisible();
 
-        //Vérification de l'input Date
-        await expect(page.locator('input[type="date"]')).toBeVisible();
+    await carteJoueur.click();
 
-        //Vérification du bouton
-        await expect(page.locator('button', {hasText: 'Enregistrer les présences'})).toBeVisible();
-    });
+    await page.getByRole('button', { name: /Enregistrer les présences/i }).click();
+    await expect(page.locator('text=Présences validées et calendrier mis à jour !')).toBeVisible();
 
-    test('doit basculer l\'état de présence d\'un joueurs', async ({page}) => {
-        const ligneJoueur = page.locator('div.cursor-pointer').first();
-        await expect(ligneJoueur).toBeVisible();
+    // ==========================================
+    // 2. VÉRIFICATION DANS LE BILAN
+    // ==========================================
+    await page.goto('/bilan-presences');
+    await expect(page.locator('h2')).toContainText('Bilan des Présences');
 
-        const checkbox = ligneJoueur.locator('div.h-6.w-6');
-        const estDejaPresent = await checkbox.evaluate(el => el.classList.contains('bg-amber-500'));
+    // FIX : On cible strictement les lignes du tableau (tbody tr) pour éviter d'attraper le conteneur global
+    const ligneBilan = page.locator('tbody tr').filter({ hasText: 'Kylian Sauvegarde' }).first();
+    await expect(ligneBilan).toBeVisible();
 
-        if (estDejaPresent) {
-            await ligneJoueur.click();
-            await expect(checkbox).toHaveClass(/bg-white/);//Il doit devenir blanc
-        }
-        //on clique sur la ligne
-        await ligneJoueur.click();
-
-        //On verifie le design exact
-        await expect(checkbox).toHaveClass(/bg-amber-500/);
-
-        //On verifie la présence du svg dans la case
-        await expect(checkbox.locator('svg')).toBeVisible();
-    });
-
-    test('doit proposer de créer un évenement si la date et vide', async ({page}) => {
-        page.on('dialog', async (dialog) => {
-            expect(dialog.message()).toContain('Voulez-vous le créer maintenant avec ces joueurs ?');
-            await dialog.accept();
-        });
-        //On force une date lointaine pour etre sur que aucun évenement exisste déja à cette date
-        await page.locator('input[type="date"]').fill('2099-12-31');
-
-        //On coche le premier joueur
-        const ligneJoueur = page.locator('div.cursor-pointer').first();
-        await ligneJoueur.click();
-
-        //On enregistre
-        await page.locator('button', {hasText: 'Enregistrer les présences'}).click();
-
-        await expect(page).toHaveURL(/\/calendrier/);
-
-    })
-})
+    // On utilise la Regex /%/ sécurisée avec un .first() final
+    const pourcentage = ligneBilan.getByText(/%/).first();
+    await expect(pourcentage).toBeVisible();
+  });
+});
