@@ -13,7 +13,7 @@ export class Changelog {
   private authService = inject(AuthService);
   
   isVisible = signal(false);
-  private readonly CURRENT_VERSION = 'v2.0';
+  private readonly CURRENT_VERSION = 'v2.1';
 
   constructor() {
     effect(() => {
