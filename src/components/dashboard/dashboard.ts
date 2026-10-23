@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, effect, inject, OnDestroy, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DashboardService } from '@/src/services/dashboard.service';
@@ -11,6 +11,7 @@ import { ContexteService } from '@/src/services/contexte.service';
   standalone: true,
   imports: [CommonModule, RouterLink, DatePipe, OrganigrammeEditeur],
   templateUrl: './dashboard.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit, OnDestroy {

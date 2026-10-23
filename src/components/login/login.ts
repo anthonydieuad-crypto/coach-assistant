@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -9,6 +9,7 @@ import { ToastrService } from 'ngx-toastr'; // 👈 1. Import du service
     selector: 'app-login',
     standalone: true,
     imports: [FormsModule, RouterLink],
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './login.component.html'
 })
 export class LoginComponent {

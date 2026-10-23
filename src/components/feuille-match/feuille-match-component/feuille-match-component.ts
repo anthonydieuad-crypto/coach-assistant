@@ -1,11 +1,12 @@
 import { JoueurService } from '@/src/services/joueur.service';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-feuille-match-component',
   imports: [],
   templateUrl: './feuille-match-component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './feuille-match-component.css',
 })
 export class FeuilleMatchComponent {

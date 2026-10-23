@@ -1,5 +1,5 @@
 import { AuthService } from '@/src/services/auth.service';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -9,6 +9,7 @@ import { finalize } from 'rxjs';
   selector: 'app-reset-password',
   imports: [FormsModule, RouterLink],
   templateUrl: './reset-password.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './reset-password.css',
 })
 export class ResetPassword implements OnInit{

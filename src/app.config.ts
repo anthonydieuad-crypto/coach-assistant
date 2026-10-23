@@ -3,7 +3,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 
 // 👇 Imports HTTP et Intercepteurs
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
 import { loaderInterceptor } from './interceptors/loader.interceptor';
 import { authInterceptor } from './interceptors/auth.interceptor'; // 👈 Vérifie ce chemin
 
@@ -19,7 +19,7 @@ export const appConfig: ApplicationConfig = {
     provideToastr(),
 
     // 👇 C'EST ICI QUE TOUT SE JOUE
-    provideHttpClient(
+    provideHttpClient(withXhr(), 
       // On liste simplement les intercepteurs dans l'ordre d'exécution
       withInterceptors([
         loaderInterceptor, // D'abord le loader

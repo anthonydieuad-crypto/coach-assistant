@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { JoueurService } from '../../services/joueur.service'; // Ajout du service
@@ -7,6 +7,7 @@ import { JoueurService } from '../../services/joueur.service'; // Ajout du servi
   selector: 'app-generateur-convocation',
   standalone: true,
   imports: [CommonModule, FormsModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './generateur-convocation.html'
 })
 export class GenerateurConvocationComponent implements OnInit {

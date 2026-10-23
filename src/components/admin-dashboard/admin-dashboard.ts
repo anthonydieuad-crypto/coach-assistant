@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { AdminService, UserAdmin, ClubAdmin } from '../../services/admin.service';
 import { ToastrService } from 'ngx-toastr';
@@ -8,6 +8,7 @@ import { RouterLink } from '@angular/router';
   selector: 'app-admin-dashboard',
   standalone: true,
   imports: [CommonModule, RouterLink],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './admin-dashboard.html'
 })
 export class AdminDashboardComponent implements OnInit {

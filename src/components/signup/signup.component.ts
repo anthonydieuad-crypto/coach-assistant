@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -10,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
     selector: 'app-signup',
     standalone: true,
     imports: [FormsModule, RouterLink, NgClass], // <-- AJOUT ICI
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './signup.component.html'
 })
 export class SignupComponent implements OnInit {

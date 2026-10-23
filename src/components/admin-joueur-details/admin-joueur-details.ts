@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -10,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
   selector: 'app-admin-joueur-detail',
   standalone: true,
   imports: [CommonModule, NgOptimizedImage, GraphiqueJonglesComponent, RouterLink, FormsModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './admin-joueur-details.html',
 })
 export class AdminJoueurDetail implements OnInit {

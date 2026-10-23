@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService, AdminJoueurDto } from '../../services/admin.service';
@@ -9,6 +9,7 @@ import { RouterLink } from '@angular/router';
   selector: 'app-admin-archives',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './admin-archives.html'
 })
 export class AdminArchives implements OnInit {

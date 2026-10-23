@@ -1,4 +1,4 @@
-import {Component, inject, signal} from '@angular/core';
+import {Component, inject, signal, ChangeDetectionStrategy} from '@angular/core';
 import {AuthService} from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -9,6 +9,7 @@ import { SaisonService } from '@/src/services/saison.service';
     selector: 'app-profil',
     standalone: true,
     imports: [FormsModule],
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './profil.component.html'
 })
 export class ProfilComponent {

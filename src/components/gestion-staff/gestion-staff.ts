@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { FormsModule } from '@angular/forms'; 
 import { Invitation, InvitationService } from '@/src/services/invitation.service';
@@ -11,6 +11,7 @@ import { finalize } from 'rxjs';
   standalone: true, 
   imports: [CommonModule, FormsModule], 
   templateUrl: './gestion-staff.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './gestion-staff.css',
 })
 export class GestionStaff implements OnInit {

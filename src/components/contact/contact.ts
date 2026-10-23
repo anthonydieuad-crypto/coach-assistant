@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ContactService } from '../../services/contact.service';
 import { ToastrService } from 'ngx-toastr';
@@ -9,6 +9,7 @@ import { finalize } from 'rxjs';
   selector: 'app-contact',
   standalone: true,
   imports: [FormsModule],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './contact.html'
 })
 export class Contact {

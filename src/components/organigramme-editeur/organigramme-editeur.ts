@@ -1,6 +1,6 @@
 import { NoeudService } from '@/src/services/noeud.service';
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop'
 
@@ -15,6 +15,7 @@ interface NoeudPlat {
   selector: 'app-organigramme-editeur',
   imports: [CommonModule, DragDropModule],
   templateUrl: './organigramme-editeur.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './organigramme-editeur.css',
 })
 export class OrganigrammeEditeur implements OnInit {

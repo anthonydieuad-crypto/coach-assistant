@@ -3,7 +3,7 @@
    <!-- Sélecteur de Saison -->
    <div class="relative flex-1 sm:flex-none">
      <select
-         [value]="contexteService.saisonActive()?.id"
+         [value]="$safeNavigationMigration(contexteService.saisonActive()?.id)"
          (change)="onSaisonChange($event)"
        class="bg-transparent w-full text-amber-500 font-bold text-xs sm:text-sm border-none outline-none focus:ring-0 py-1 pl-2 pr-6 appearance-none cursor-pointer truncate">
        @for (saison of saisons(); track saison.id) {
@@ -20,7 +20,7 @@
    <!-- Sélecteur de Nœud (équipe) -->
    <div class="relative flex-1 sm:flex-none">
      <select
-         [value]="contexteService.noeudActif()?.id"
+         [value]="$safeNavigationMigration(contexteService.noeudActif()?.id)"
          (change)="onNoeudChange($event)"
        class="bg-transparent w-full text-white font-medium text-xs sm:text-sm border-none outline-none focus:ring-0 py-1 pl-2 pr-6 appearance-none cursor-pointer truncate">
        @for (noeud of noeuds(); track noeud.id) {

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Noeud, Saison } from '@/src/models/contexte.model';
 import { ContexteService } from '@/src/services/contexte.service';
 import { NoeudService } from '@/src/services/noeud.service';
@@ -8,6 +8,7 @@ import { SaisonService } from '@/src/services/saison.service';
   selector: 'app-contexte-selector',
   imports: [],
   templateUrl: './contexte-selector.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './contexte-selector.css',
 })
 export class ContexteSelector implements OnInit {
