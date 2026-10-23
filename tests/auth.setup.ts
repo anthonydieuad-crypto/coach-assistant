@@ -13,6 +13,16 @@ dotenv.config({ path: path.resolve(__dirname, '.env') });
 const authFile = 'playwright/.auth/user.json';
 
 setup('Authentification globale', async ({page}) => {
+    const email = process.env['TEST_EMAIL'];
+    const password = process.env['TEST_PASSWORD'];
+
+    if (!email || !password) {
+        throw new Error(
+            "Variables d'environnement TEST_EMAIL ou TEST_PASSWORD manquantes. " +
+            "Renseignez-les dans tests/.env en local ou dans les Secrets GitHub Actions."
+        );
+    }
+
     // 1. Bypass de la modale "Quoi de neuf ?" V2.0
     await page.addInitScript(() => {
         window.localStorage.setItem('changelog_version', 'v2.0');
@@ -22,8 +32,8 @@ setup('Authentification globale', async ({page}) => {
     await page.goto('/login');
 
     // 3. Remplissage avec les variables d'environnement sécurisées
-    await page.fill('input[name="email"]', process.env['TEST_EMAIL']!);
-    await page.fill('input[name="password"]', process.env['TEST_PASSWORD']!);
+    await page.fill('input[name="email"]', email);
+    await page.fill('input[name="password"]', password);
 
     // 4. Soumission
     await page.click('button[type="submit"]');
