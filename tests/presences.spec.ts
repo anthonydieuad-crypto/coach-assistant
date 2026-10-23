@@ -5,7 +5,7 @@ test.describe('Parcours 5 : Saisie des présences et Bilans', () => {
   test.beforeEach(async ({ page }) => {
     // La session de test (Indépendant) est maintenue
     await page.addInitScript(() => {
-        window.localStorage.setItem('changelog_version', 'v2.0');
+        window.localStorage.setItem('changelog_version', 'v2.1');
     });
   });
 

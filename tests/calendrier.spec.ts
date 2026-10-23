@@ -4,7 +4,7 @@ test.describe('Parcours 3 : Cycle de vie complet du Calendrier', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => {
-        window.localStorage.setItem('changelog_version', 'v2.0');
+        window.localStorage.setItem('changelog_version', 'v2.1');
     });
     await page.goto('/calendrier');
   });

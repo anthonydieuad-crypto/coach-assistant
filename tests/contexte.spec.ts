@@ -6,7 +6,7 @@ test.describe('Sélecteur de Contexte (Saison & Équipe)', () => {
     // Le setup d'authentification a déjà été joué par auth.setup.ts
     // On s'assure juste de bypasser le changelog de la V2
     await page.addInitScript(() => {
-        window.localStorage.setItem('changelog_version', 'v2.0');
+        window.localStorage.setItem('changelog_version', 'v2.1');
     });
     // On se place sur le dashboard pour avoir accès à la navbar
     await page.goto('/dashboard');

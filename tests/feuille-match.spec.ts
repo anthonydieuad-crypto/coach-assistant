@@ -5,7 +5,7 @@ test.describe('Parcours 4 : Feuille de Match (Règles FFF)', () => {
   test.beforeEach(async ({ page }) => {
     // La session est conservée par auth.setup.ts
     await page.addInitScript(() => {
-        window.localStorage.setItem('changelog_version', 'v2.0');
+        window.localStorage.setItem('changelog_version', 'v2.1');
     });
   });
 

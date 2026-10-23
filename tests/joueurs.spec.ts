@@ -5,7 +5,7 @@ test.describe('Parcours 2 : Cycle de vie d\'un Joueur (CRUD)', () => {
   test.beforeEach(async ({ page }) => {
     // Le setup d'authentification a déjà connecté le compte coach de test
     await page.addInitScript(() => {
-        window.localStorage.setItem('changelog_version', 'v2.0');
+        window.localStorage.setItem('changelog_version', 'v2.1');
     });
     // Navigation directe vers l'effectif
     await page.goto('/joueurs');
