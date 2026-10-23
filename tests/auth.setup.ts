@@ -12,7 +12,11 @@ dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const authFile = 'playwright/.auth/user.json';
 
-setup('Authentification globale', async ({page}) => {
+setup('Authentification globale', async ({ page }) => {
+    // Affiche les logs et erreurs JavaScript de la console du navigateur dans le terminal
+    page.on('console', msg => console.log(`[CONSOLE ${msg.type()}]: ${msg.text()}`));
+    page.on('pageerror', err => console.error(`[CONSOLE ERROR]: ${err.message}`));
+
     const email = process.env['TEST_EMAIL'];
     const password = process.env['TEST_PASSWORD'];
 
@@ -23,9 +27,9 @@ setup('Authentification globale', async ({page}) => {
         );
     }
 
-    // 1. Bypass de la modale "Quoi de neuf ?" V2.0
+    // 1. Bypass de la modale "Quoi de neuf ?" V2.1
     await page.addInitScript(() => {
-        window.localStorage.setItem('changelog_version', 'v2.0');
+        window.localStorage.setItem('changelog_version', 'v2.1');
     });
 
     // 2. Navigation vers la page de login
@@ -35,12 +39,23 @@ setup('Authentification globale', async ({page}) => {
     await page.fill('input[name="email"]', email);
     await page.fill('input[name="password"]', password);
 
-    // 4. Soumission
-    await page.click('button[type="submit"]');
+    // 4. Soumission et écoute de la réponse API
+    const [loginResponse] = await Promise.all([
+        page.waitForResponse(res => res.url().includes('/auth/login'), { timeout: 15000 }),
+        page.click('button[type="submit"]')
+    ]);
+
+    const status = loginResponse.status();
+    const body = await loginResponse.text().catch(() => '');
+    console.log(`[LOGIN API RESULT]: HTTP ${status} - ${body}`);
+
+    if (!loginResponse.ok()) {
+        throw new Error(`Le backend a refusé la connexion (HTTP ${status}): ${body}`);
+    }
 
     // 5. On attend d'être bien arrivé sur le dashboard
-    await page.waitForURL('/dashboard');
+    await page.waitForURL('/dashboard', { timeout: 15000 });
 
     // 6. Sauvegarde de la session (Token JWT) pour les autres tests
-    await page.context().storageState({path: authFile});
+    await page.context().storageState({ path: authFile });
 });
