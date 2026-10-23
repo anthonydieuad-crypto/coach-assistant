@@ -17,15 +17,19 @@ setup('Authentification globale', async ({ page }) => {
     page.on('console', msg => console.log(`[CONSOLE ${msg.type()}]: ${msg.text()}`));
     page.on('pageerror', err => console.error(`[CONSOLE ERROR]: ${err.message}`));
 
-    const email = process.env['TEST_EMAIL'];
-    const password = process.env['TEST_PASSWORD'];
+    const rawEmail = process.env['TEST_EMAIL'];
+    const rawPassword = process.env['TEST_PASSWORD'];
 
-    if (!email || !password) {
+    if (!rawEmail || !rawPassword) {
         throw new Error(
             "Variables d'environnement TEST_EMAIL ou TEST_PASSWORD manquantes. " +
             "Renseignez-les dans tests/.env en local ou dans les Secrets GitHub Actions."
         );
     }
+
+    // Nettoie d'éventuels espaces ou retours à la ligne copiés par inadvertance dans GitHub Secrets
+    const email = rawEmail.trim();
+    const password = rawPassword.trim();
 
     // 1. Bypass de la modale "Quoi de neuf ?" V2.1
     await page.addInitScript(() => {
