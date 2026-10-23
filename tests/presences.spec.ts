@@ -10,6 +10,11 @@ test.describe('Parcours 5 : Saisie des présences et Bilans', () => {
   });
 
   test('Doit marquer un joueur présent et valider le calcul des statistiques', async ({ page }) => {
+    // Interception automatique de la boîte de dialogue si un entraînement doit être créé à la volée
+    page.on('dialog', async (dialog) => {
+      await dialog.accept();
+    });
+
     // ==========================================
     // 1. SAISIE DES PRÉSENCES
     // ==========================================
