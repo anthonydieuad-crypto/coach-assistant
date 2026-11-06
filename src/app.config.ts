@@ -1,4 +1,4 @@
-import { ApplicationConfig } from '@angular/core';
+import { ApplicationConfig, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 
@@ -10,6 +10,7 @@ import { authInterceptor } from './interceptors/auth.interceptor'; // 👈 Véri
 // 👇 Imports Animations & Toastr
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideToastr } from 'ngx-toastr';
+import { provideServiceWorker } from '@angular/service-worker';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,13 +19,14 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     provideToastr(),
 
-    // 👇 C'EST ICI QUE TOUT SE JOUE
     provideHttpClient(withXhr(), 
-      // On liste simplement les intercepteurs dans l'ordre d'exécution
       withInterceptors([
-        loaderInterceptor, // D'abord le loader
-        authInterceptor    // Ensuite l'auth (ajoute le token)
+        loaderInterceptor,
+        authInterceptor 
       ])
-    )
+    ), provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+          })
   ]
 };
