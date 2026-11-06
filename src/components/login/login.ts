@@ -1,9 +1,9 @@
-import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy, HostListener } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs/operators';
-import { ToastrService } from 'ngx-toastr'; // 👈 1. Import du service
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-login',
@@ -13,7 +13,6 @@ import { ToastrService } from 'ngx-toastr'; // 👈 1. Import du service
     templateUrl: './login.component.html'
 })
 export class LoginComponent {
-    // 👇 2. On injecte le ToastrService avec la méthode moderne inject()
     private authService = inject(AuthService);
     private toastr = inject(ToastrService);
     private router = inject(Router);
@@ -22,6 +21,37 @@ export class LoginComponent {
     password = signal('');
     erreur = signal('');
     isLoading = signal(false);
+
+    // Variables pour gérer l'installation PWA
+    deferredPrompt: any = null;
+    showInstallButton = signal(false);
+
+    // Écoute de l'événement d'installation
+    @HostListener('window:beforeinstallprompt', ['$event'])
+    onBeforeInstallPrompt(e: Event) {
+        // Empêche le mini-infobar de Chrome d'apparaître
+        e.preventDefault();
+        // Stocke l'événement pour pouvoir le déclencher plus tard
+        this.deferredPrompt = e;
+        // Affiche le bouton d'installation dans l'interface
+        this.showInstallButton.set(true);
+    }
+
+    installerPWA() {
+        // Cache le bouton d'installation
+        this.showInstallButton.set(false);
+        // Déclenche l'invite d'installation native
+        this.deferredPrompt.prompt();
+        // Attend que l'utilisateur réponde à l'invite
+        this.deferredPrompt.userChoice.then((choiceResult: any) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('L\'utilisateur a accepté l\'installation');
+            } else {
+                console.log('L\'utilisateur a refusé l\'installation');
+            }
+            this.deferredPrompt = null;
+        });
+    }
 
     seConnecter() {
         this.isLoading.set(true);
@@ -32,7 +62,6 @@ export class LoginComponent {
                 finalize(() => this.isLoading.set(false))
             )
             .subscribe({
-                // 👇 3. Correction de la syntaxe ici :
                 next: () => {
                     // On affiche le toast
                     this.toastr.success('Heureux de vous revoir, Coach !', 'Connexion réussie');
